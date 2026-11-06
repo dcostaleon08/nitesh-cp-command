@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nitesh Kumar Jain — CP Command Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #070b14;
+      color: #f1f5f9;
+      margin: 0;
+      padding: 0;
+    }
+    .card-dark {
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.96) 0%, rgba(11, 17, 32, 0.98) 100%);
+      border: 1px solid rgba(51, 65, 85, 0.65);
+      border-radius: 1rem;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+    }
+    .sub-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(51, 65, 85, 0.55);
+      border-radius: 0.75rem;
+    }
+    .persona-fav { background: rgba(120, 83, 14, 0.28); border: 1px solid rgba(245, 158, 11, 0.45); color: #fcd34d; }
+    .persona-hni { background: rgba(88, 28, 135, 0.28); border: 1px solid rgba(168, 85, 247, 0.45); color: #d8b4fe; }
+    .persona-ok  { background: rgba(12, 74, 110, 0.28); border: 1px solid rgba(56, 189, 248, 0.45); color: #7dd3fc; }
+    .persona-topi { background: rgba(124, 45, 18, 0.28); border: 1px solid rgba(249, 115, 22, 0.45); color: #fdba74; }
+    .persona-dead { background: rgba(127, 29, 29, 0.25); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; }
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #0b1120; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  </style>
+</head>
+<body class="min-h-screen pb-16">
+
+  <!-- TOP HEADER -->
+  <header class="sticky top-0 z-40 bg-[#0b1120]/95 backdrop-blur border-b border-slate-800/80 px-4 py-3.5">
+    <div class="max-w-6xl mx-auto space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-black text-slate-950 text-base shadow-lg">
+            NJ
+          </div>
+          <div>
+            <h1 class="text-base sm:text-lg font-extrabold text-white tracking-tight">
+              Nitesh Kumar Jain — CP Command Center
+            </h1>
+            <p class="text-[11px] sm:text-xs text-slate-400">
+              📍 Base: Mallikarjuna Meadows, KG Nagar &nbsp;|&nbsp; 🏢 Focus Sites: Vasanta Skye (73.2 km RT) &amp; Forest Ridge (28.1 km RT)
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="openAddCPModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-bold flex items-center gap-1.5 transition">
+            ➕ + Add CP
+          </button>
+          <button onclick="exportFullCSV()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-lg transition">
+            📥 Export Full Excel (.CSV)
+          </button>
+          <button onclick="downloadUpdatedHTMLFile()" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold flex items-center gap-1.5 shadow-lg transition" title="Save updated niteshcp.html with all your latest changes">
+            💾 Save Updated HTML
+          </button>
+        </div>
+      </div>
+
+      <!-- NAVIGATION PILLS -->
+      <div class="flex overflow-x-auto gap-2 pb-1 custom-scroll">
+        <button id="nav-tab-1" onclick="switchTab(1)" class="px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap bg-indigo-600 text-white shadow-md transition">
+          📈 1. My Profile &amp; Priority Radar
+        </button>
+        <button id="nav-tab-2" onclick="switchTab(2)" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800 transition">
+          📍 2. Zone Cluster &amp; Line-Caller (<span id="nav-cp-count">164</span> CPs)
+        </button>
+        <button id="nav-tab-3" onclick="switchTab(3)" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800 transition">
+          ☑️ 3. Today's Beat &amp; Timestamp Logger (<span id="nav-sched-count">3</span>)
+        </button>
+        <button id="nav-tab-4" onclick="switchTab(4)" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800 transition">
+          ⚠️ 4. Missing Address Queue (<span id="nav-missing-count">38</span>)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="max-w-6xl mx-auto px-4 mt-5 space-y-6">
+
+    <!-- ==================== TAB 1: MY PROFILE & PRIORITY RADAR ==================== -->
+    <section id="view-tab-1" class="space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- CARD 1: SOURCING MANAGER PROFILING -->
+        <div class="card-dark p-5 space-y-4">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-400">Card 1 • Sourcing Manager Profiling</div>
+              <h2 class="text-lg font-extrabold text-white mt-0.5">CP Portfolio Health &amp; Activation Engine</h2>
+            </div>
+            <div class="text-right">
+              <div class="text-[11px] text-slate-400">2026 Walk-ins Logged</div>
+              <div class="text-2xl font-black text-amber-400" id="kpi-walkins">63</div>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="space-y-1.5">
+            <div class="flex justify-between text-xs font-bold">
+              <span class="text-emerald-400" id="kpi-active-text">Current Active Walk-in CPs: 41 of 164 CPs (25.0%)</span>
+              <span class="text-indigo-300">Target: 35% Active</span>
+            </div>
+            <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+              <div id="kpi-progress-bar" class="h-full bg-gradient-to-r from-emerald-500 via-amber-400 to-indigo-500 rounded-full" style="width: 71%"></div>
+            </div>
+          </div>
+
+          <!-- 4 Stat Boxes -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="sub-card p-3">
+              <div class="text-[11px] text-slate-400">2025 Past Bookings</div>
+              <div class="text-base font-extrabold text-indigo-300 mt-0.5"><span id="kpi-b25">34</span> Deals (18 CPs)</div>
+            </div>
+            <div class="sub-card p-3">
+              <div class="text-[11px] text-slate-400">2026 Bookings / Rev</div>
+              <div class="text-base font-extrabold text-emerald-400 mt-0.5"><span id="kpi-b26">0</span> (₹2.60 Cr)</div>
+            </div>
+            <div class="sub-card p-3 cursor-pointer hover:border-rose-500/50" onclick="switchTab(4)">
+              <div class="text-[11px] text-slate-400">Missing Addresses</div>
+              <div class="text-base font-extrabold text-rose-400 mt-0.5"><span id="kpi-missing">38</span> CPs</div>
+            </div>
+            <div class="sub-card p-3 cursor-pointer hover:border-amber-500/50" onclick="switchTab(3)">
+              <div class="text-[11px] text-slate-400">Claimable Conveyance</div>
+              <div class="text-base font-extrabold text-amber-400 mt-0.5"><span id="kpi-kms">814.6</span> km</div>
+            </div>
+          </div>
+
+          <!-- Persona Tag Filter Cards -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-400">Click any Persona Tag to filter CPs:</span>
+              <button onclick="setPersonaFilter('ALL')" class="text-xs text-indigo-400 hover:underline font-semibold">Reset Filter</button>
+            </div>
+            <div class="grid grid-cols-2 gap-2.5" id="persona-cards-grid"></div>
+          </div>
+        </div>
+
+        <!-- CARD 2: DAILY BEAT & MEETING PLANNER -->
+        <div class="card-dark p-5 space-y-4">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-400">Card 2 • Daily Beat &amp; Meeting Planner</div>
+              <h2 class="text-lg font-extrabold text-white mt-0.5">Today's Scheduled Loop (<span id="card2-sched-count">3</span> CPs)</h2>
+            </div>
+            <button onclick="switchTab(3)" class="px-3 py-1.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 text-xs font-bold">
+              Open Logger &rarr;
+            </button>
+          </div>
+
+          <p class="text-xs text-slate-400">Pick a Zone below to line-call CPs &amp; lock 3–4 nearby meetings for today:</p>
+
+          <!-- Zone Quick Jump List -->
+          <div id="zone-quick-list" class="space-y-2 max-h-56 overflow-y-auto pr-1 custom-scroll"></div>
+
+          <!-- Today's Confirmed Lineup Box -->
+          <div class="sub-card p-3.5 space-y-2.5 border-amber-500/30">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold text-amber-400 flex items-center gap-1.5">📅 Today's Confirmed Lineup:</span>
+              <span class="text-[11px] text-slate-400" id="card2-est-loop">Est. Loop: ~26.2 km</span>
+            </div>
+            <div id="card2-lineup-list" class="space-y-2 max-h-44 overflow-y-auto pr-1 custom-scroll"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- AI PRIORITY & TIME ALLOCATION ENGINE -->
+      <div class="card-dark p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div class="text-[11px] font-extrabold uppercase tracking-wider text-amber-400">AI Priority &amp; Time Allocation Engine</div>
+            <h2 class="text-lg font-extrabold text-white">Top Priority CPs — Whom to Meet First &amp; How Much Time to Give</h2>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="openWeeklyLeadModal()" class="px-3.5 py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-extrabold">
+              ⚡ + Log Weekly Walk-in / Booking to Refresh Priority
+            </button>
+            <input type="text" id="radar-search" oninput="renderPriorityRadar()" placeholder="Search 164 CPs, mobile, area..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white w-56" />
+          </div>
+        </div>
+
+        <div id="priority-radar-list" class="grid grid-cols-1 md:grid-cols-2 gap-3.5 max-h-[600px] overflow-y-auto pr-1 custom-scroll"></div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: ZONE CLUSTER & LINE-CALLER (ALL 164 CPs) ==================== -->
+    <section id="view-tab-2" class="hidden space-y-5">
+      <div class="card-dark p-5 space-y-4">
+        <div>
+          <div class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-400">Cluster Beat &amp; Sequential Tele-Caller</div>
+          <h2 class="text-lg font-extrabold text-white">Call Nearby CPs Line-by-Line — Lock 3 to 4 Meetings in One Shot</h2>
+        </div>
+
+        <!-- Search & 3 Dropdown Filters -->
+        <div class="space-y-3">
+          <input type="text" id="caller-search" oninput="renderCallerCards()" placeholder="🔍 Search CP, firm, mobile, area, project..." class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white" />
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="text-[11px] text-slate-400 font-semibold block mb-1">1. Select Geographical Zone:</label>
+              <select id="caller-zone-select" onchange="onCallerZoneChange()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white font-bold"></select>
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 font-semibold block mb-1">2. Select Micro-Cluster (Same Pocket):</label>
+              <select id="caller-cluster-select" onchange="renderCallerCards()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white font-bold"></select>
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 font-semibold block mb-1">3. Filter by Persona Badge:</label>
+              <select id="caller-persona-select" onchange="renderCallerCards()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white font-bold"></select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Line-by-Line CP Cards -->
+      <div id="caller-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+    <!-- ==================== TAB 3: TODAY'S BEAT, TIMESTAMP LOGGER & CONVEYANCE ==================== -->
+    <section id="view-tab-3" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Left: Meeting Check-In & Timestamp Logger -->
+        <div class="card-dark p-5 space-y-4 lg:col-span-1">
+          <div class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-400">Live Field Check-In</div>
+          <h3 class="text-base font-extrabold text-white">☑️ Complete Meeting &amp; Stamp Time</h3>
+
+          <div class="space-y-3">
+            <div>
+              <label class="text-xs text-slate-400 font-semibold block mb-1">Select Channel Partner:</label>
+              <select id="logger-cp-dropdown" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold"></select>
+            </div>
+            <div>
+              <label class="text-xs text-slate-400 font-semibold block mb-1">Discussion Notes / Promises Made:</label>
+              <textarea id="logger-mom-input" rows="3" placeholder="e.g. Met team, pitched Sattva Vasanta Skye & Forest Ridge, promised 2 walk-ins this weekend..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white"></textarea>
+            </div>
+            <button onclick="submitMeetingLogger()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg">
+              ✅ Mark Done + Auto-Timestamp + Add Kms
+            </button>
+          </div>
+
+          <hr class="border-slate-800" />
+          <div class="space-y-2">
+            <div class="text-xs font-extrabold text-amber-400">🏢 1-Click Site Office Duty Log:</div>
+            <div class="grid grid-cols-1 gap-2">
+              <button onclick="addSiteVisitTrip('Sattva Vasanta Skye (Devanahalli)', 73.2)" class="py-2 px-3 rounded-lg bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-500/40 text-indigo-200 text-xs font-bold text-left">
+                + Log Sattva Vasanta Skye (73.2 km RT)
+              </button>
+              <button onclick="addSiteVisitTrip('Sattva Forest Ridge (JP Nagar 9th Ph)', 28.1)" class="py-2 px-3 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-200 text-xs font-bold text-left">
+                + Log Sattva Forest Ridge (28.1 km RT)
+              </button>
+            </div>
+          </div>
+
+          <hr class="border-slate-800" />
+          <div>
+            <h4 class="text-xs font-extrabold text-slate-300 mb-2">🕒 Completed Meetings Log:</h4>
+            <div id="completed-meetings-list" class="space-y-2 max-h-60 overflow-y-auto custom-scroll pr-1"></div>
+          </div>
+        </div>
+
+        <!-- Right: Conveyance Claim Table -->
+        <div class="card-dark p-5 space-y-4 lg:col-span-2">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <div class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-400">Sattva Local Conveyance Claim</div>
+              <h3 class="text-base font-extrabold text-white">🚗 October–November 2026 Conveyance Ledger</h3>
+            </div>
+            <button onclick="exportConveyanceCSV()" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold shadow">
+              📥 Export Conveyance (.CSV)
+            </button>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3">
+            <div class="sub-card p-3">
+              <div class="text-[11px] text-slate-400">Total Distance</div>
+              <div class="text-lg font-black text-white" id="conv-sum-km">814.6 km</div>
+            </div>
+            <div class="sub-card p-3">
+              <div class="text-[11px] text-slate-400">2-Wheeler (@ ₹5.50/km)</div>
+              <div class="text-lg font-black text-emerald-400" id="conv-sum-2w">₹4,480.30</div>
+            </div>
+            <div class="sub-card p-3">
+              <div class="text-[11px] text-slate-400">4-Wheeler (@ ₹9.00/km)</div>
+              <div class="text-lg font-black text-amber-400" id="conv-sum-4w">₹7,331.40</div>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto max-h-[460px] custom-scroll">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="bg-slate-900 text-slate-300 sticky top-0">
+                <tr>
+                  <th class="p-2.5">Date</th>
+                  <th class="p-2.5">Circuit (From &rarr; To &rarr; Home)</th>
+                  <th class="p-2.5">Purpose</th>
+                  <th class="p-2.5 text-right">Kms</th>
+                  <th class="p-2.5 text-right">2W (₹5.5)</th>
+                  <th class="p-2.5 text-right">4W (₹9.0)</th>
+                </tr>
+              </thead>
+              <tbody id="conv-rows-body" class="divide-y divide-slate-800/80"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: MISSING ADDRESS QUEUE (38 CPs) ==================== -->
+    <section id="view-tab-4" class="hidden space-y-5">
+      <div class="card-dark p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <div class="text-[11px] font-extrabold uppercase tracking-wider text-rose-400">Data Hygiene &amp; Tele-Verification</div>
+            <h2 class="text-lg font-extrabold text-white">⚠️ CPs Where Office Address is Not Mentioned (<span id="missing-header-count">38</span> CPs)</h2>
+            <p class="text-xs text-slate-400">Call or WhatsApp these CPs to ask for their office location. Type their area below to automatically map them into a Zone Cluster!</p>
+          </div>
+        </div>
+
+        <div id="missing-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: WEEKLY LEAD / BOOKING UPDATER -->
+  <div id="modal-weekly" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="card-dark max-w-md w-full p-5 space-y-4 border border-amber-500/40">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-extrabold text-white">⚡ Log Weekly Walk-ins &amp; Monthly Bookings</h3>
+        <button onclick="closeWeeklyLeadModal()" class="text-slate-400 hover:text-white font-bold">✕</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="text-slate-400 font-semibold block mb-1">Select Channel Partner:</label>
+          <select id="modal-cp-select" onchange="loadModalCPStats()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white font-bold"></select>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="text-slate-400 block mb-1">Sep Walk-ins</label>
+            <input type="number" id="modal-sep-w" class="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-white font-bold" />
+          </div>
+          <div>
+            <label class="text-slate-400 block mb-1">Oct Walk-ins</label>
+            <input type="number" id="modal-oct-w" class="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-white font-bold" />
+          </div>
+          <div>
+            <label class="text-amber-400 font-bold block mb-1">Nov Walk-ins</label>
+            <input type="number" id="modal-nov-w" class="w-full bg-slate-900 border border-amber-500 rounded px-2.5 py-1.5 text-amber-300 font-bold" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-slate-400 block mb-1">2025 Bookings</label>
+            <input type="number" id="modal-b25" class="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-white font-bold" />
+          </div>
+          <div>
+            <label class="text-emerald-400 font-bold block mb-1">2026 Bookings</label>
+            <input type="number" id="modal-b26" class="w-full bg-slate-900 border border-emerald-500 rounded px-2.5 py-1.5 text-emerald-300 font-bold" />
+          </div>
+        </div>
+        <div>
+          <label class="text-slate-400 block mb-1">Projects Pitched / Walk-in:</label>
+          <input type="text" id="modal-projects" class="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-white" />
+        </div>
+        <button onclick="saveModalCPStats()" class="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold shadow-lg">
+          🔄 Update &amp; Recalculate Priority Radar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD NEW CP -->
+  <div id="modal-add-cp" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="card-dark max-w-md w-full p-5 space-y-4 border border-indigo-500/40">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-extrabold text-white">➕ Empanel New Channel Partner</h3>
+        <button onclick="closeAddCPModal()" class="text-slate-400 hover:text-white font-bold">✕</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <input type="text" id="add-cp-name" placeholder="Channel Partner Name / Firm *" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white" />
+        <input type="text" id="add-cp-mob" placeholder="Mobile Number *" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white" />
+        <input type="text" id="add-cp-addr" placeholder="Full Office Address & Locality (e.g. HSR Layout)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white" />
+        <button onclick="saveNewCPModal()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold shadow-lg">
+          + Save &amp; Map to Zone Cluster
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DEFAULT_CPS = [{"id": "CP-001", "cpId": "217", "name": "SUMATHI V", "mobile": "9731446688", "rera": "PRM/KA/RERA/1251/309/AG/250213/005475", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 4, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "HNI", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Past closer with 4 bookings in 2025. High-potential revival target.", "scheduledToday": false}, {"id": "CP-002", "cpId": "220", "name": "ARJUN U K", "mobile": "9900096023", "rera": "PRM/KA/RERA/1271/290/AG/250811/005912", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 3, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Past closer with 3 bookings in 2025. High-potential revival target.", "scheduledToday": false}, {"id": "CP-003", "cpId": "227", "name": "FORTUNE ONE BUILDCO PRIVATE LIMITED", "mobile": "9108225595", "rera": "PRM/KA/RERA/1251/309/AG/240628/004924", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": true, "bookings2025": 1, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Past closer with 1 bookings in 2025. High-potential revival target.", "scheduledToday": false}, {"id": "CP-004", "cpId": "250", "name": "UTTAM KUMAR (RCB Realty)", "mobile": "9844439311", "rera": "PRM/KA/RERA/1251/310/AG/250904/006068", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 1, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Past closer with 1 bookings in 2025. High-potential revival target.", "scheduledToday": false}, {"id": "CP-005", "cpId": "256", "name": "G HEMANTH KUMAR REDDY", "mobile": "9108019989", "rera": "PRM/KA/RERA/1251/310/AG/250820/006048", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 1, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Past closer with 1 bookings in 2025. High-potential revival target.", "scheduledToday": false}, {"id": "CP-006", "cpId": "260", "name": "DAKSHINA REALTY / GAUTAM Singh", "mobile": "9731607426", "rera": "PRM/KA/RERA/1251/309/AG/171013/001193", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 2, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Past closer with 2 bookings in 2025. High-potential revival target.", "scheduledToday": false}, {"id": "CP-007", "cpId": "266", "name": "PROPSANGAM ENTERPRISES LLP", "mobile": "9964508500", "rera": "PRM/KA/RERA/1251/310/AG/240120/004442", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": true, "bookings2025": 1, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Past closer with 1 bookings in 2025. High-potential revival target.", "scheduledToday": false}, {"id": "CP-008", "cpId": "269", "name": "WHYTEHALL ESTATES PRIVATE LIMITED", "mobile": "9902623523", "rera": "PRM/KA/RERA/1251/309/AG/221220/003305", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Lumina", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-009", "cpId": "275", "name": "WISDOM FORTUNE PRIVATE LIMITED", "mobile": "8050080630", "rera": "PRM/KA/RERA/1251/308/AG/250425/005680", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": true, "bookings2025": 1, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Past closer with 1 bookings in 2025. High-potential revival target.", "scheduledToday": false}, {"id": "CP-010", "cpId": "288", "name": "HOST INDIA EVENTS & MARKETING PVT LTD", "mobile": "9900350826", "rera": "PRM/KA/RERA/1251/309/AG/250915/006181", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 1, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Past closer with 1 bookings in 2025. High-potential revival target.", "scheduledToday": false}, {"id": "CP-011", "cpId": "291", "name": "PROPRISE PROPERTY CONSULTING PVT LTD", "mobile": "8421114826", "rera": "PRM/KA/RERA/1251/309/AG/251129/006549", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": true, "bookings2025": 1, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 1, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Songbird Phase 2", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Past closer with 1 bookings in 2025. High-potential revival target.", "scheduledToday": false}, {"id": "CP-012", "cpId": "294", "name": "BHUVANESH", "mobile": "9606493393", "rera": "PRM/KA/RERA/1251/309/AG/210807/002439", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Dead", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-013", "cpId": "909", "name": "Ashok Kumar KB", "mobile": "9342233113", "rera": "PRM/KA/RERA/1268/378/AG/170819/000011", "address": "-", "missingAddress": true, "createdBy": "Sattva Walkin Site Guest User", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Dead", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-014", "cpId": "943", "name": "Elite Dream Makers Realty LLP", "mobile": "9113961163", "rera": "PRM/KA/RERA/1251/446/AG/230228/003459", "address": "-", "missingAddress": true, "createdBy": "Sattva Walkin Site Guest User", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Dead", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-015", "cpId": "771", "name": "V devendran", "mobile": "7842528559", "rera": "PRM/KA/RERA/1251/308/AG/240903/005058", "address": "-", "missingAddress": true, "createdBy": "Sattva Walkin Site Guest User", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Dead", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-016", "cpId": "799", "name": "Sumit", "mobile": "6360084830", "rera": "PRM/KA/RERA/1251/309/AG/210902/002537", "address": "-", "missingAddress": true, "createdBy": "Sattva Walkin Site Guest User", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Dead", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-017", "cpId": "840", "name": "Nagaraj", "mobile": "8880810009", "rera": "PRM/KA/RERA/1251/310/AG/200701/001921", "address": "-", "missingAddress": true, "createdBy": "Sattva Walkin Site Guest User", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Dead", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-018", "cpId": "1162", "name": "TAJUNNISA (Prop Tek Realty)", "mobile": "8310953244", "rera": "PRM/KA/RERA/1251/309/AG/200831/002008", "address": "# 67 NEW NO 22, 2ND CROSS, PAPANNA BLOCK, GANGANAGAR, BANGALORE , BENGALURU URBAN , KARNATAKA-560032", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)", "cluster": "Cluster 7B: RT Nagar, Ganganagar & Hebbal Kempapura", "distKm": 12.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 7B: RT Nagar, Ganganagar & Hebbal Kempapura. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-019", "cpId": "1168", "name": "RAGHAVENDRA L", "mobile": "9986042246", "rera": "PRM/KA/RERA/1251/309/AG/250130/005453", "address": "#279 2ND FLOOR 15TH MAIN RAOD NEAR SBI ATM RMV EXTENSION , SADASHIVANAGAR BANGALORE , BENGALURU URBAN , KARNATAKA-560080", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)", "cluster": "Cluster 7A: Sadashivanagar, RMV, Sanjaynagar & Mathikere", "distKm": 10.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 7A: Sadashivanagar, RMV, Sanjaynagar & Mathikere. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-020", "cpId": "1187", "name": "JIBRAN KHAN (The Only Estate)", "mobile": "9620835841", "rera": "PRM/KA/RERA/1251/309/AG/250617/005840", "address": "NO 40, FATHIMA LAYOUT, BEHIND TNT CRESCENT APARTMENT, , THANISANDRA MAIN ROAD, DR. SRK POST OFFICE, , BENGALURU URBAN , KARNATAKA-560077", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8B: Thanisandra Main Rd & Bhartiya City Belt", "distKm": 18.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8B: Thanisandra Main Rd & Bhartiya City Belt. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-021", "cpId": "1197", "name": "SACHIN C M", "mobile": "9902875662", "rera": "PRM/KA/RERA/1251/310/AG/260507/007180", "address": "400, SATHYAPARNA ELITE, FLAT NO SF-02, MPM LAYOUT, 13TH CRS , 8TH MN RD, MALATHAHALLI LAKE RD, NAGARBHAVI , BENGALURU URBAN , KARNATAKA-560056", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 1: Near Home (West & South-West)", "cluster": "Cluster 1B: Nagarbhavi, Mallathahalli & Ullal", "distKm": 9.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 1B: Nagarbhavi, Mallathahalli & Ullal. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-022", "cpId": "1212", "name": "BRICK AND FLOOR PRIVATE LIMITED", "mobile": "9986556699", "rera": "PRM/KA/RERA/1250/304/AG/251004/006282", "address": "F 2118, BLOCK II, FIRST FLOOR AT SURVEY NO. 05, JANAPRIYA HANUMAREDDY COMPLEX, HOODI VILLAGE, K.R. PURAM HOBLI, HOODI, BANGALORE NORTH, BANGALORE- 560048 , BENGALURU RURAL , KARNATAKA - 560048", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 6: East & Whitefield Corridor", "cluster": "Cluster 6C: Brookefield, Hoodi & Whitefield", "distKm": 22.4, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 6C: Brookefield, Hoodi & Whitefield. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-023", "cpId": "2359", "name": "VAISHAKH CS", "mobile": "9741206141", "rera": "PRM/KA/RERA/1251/446/AG/260910/007772", "address": "167, B2, 1ST FLOOR, 17 C MAIN ROAD , 5TH BLOCK KORAMANAGALA , BENGALURU URBAN , KARNATAKA-560095", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4B: Koramangala & Ejipura Hub", "distKm": 10.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 4B: Koramangala & Ejipura Hub. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-024", "cpId": "2130", "name": "ENTRUST ENCORE SERVICES PVT LTD", "mobile": "9632139125", "rera": "PRM/KA/RERA/1251/446/AG/230331/003540", "address": "# 24, 4TH FLOOR, 1ST CROSS, MAGRATH ROAD, BANGALORE 560 025 MAGRATH ROAD, BANGALORE 560 025 , BENGALURU URBAN , KARNATAKA - 560025", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 2: Central CBD & Infantry Rd", "cluster": "Cluster 2A: Infantry Rd & MG Rd Loop", "distKm": 7.2, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "HNI", "lastVisited": "2026-10-08 (Magrath Rd)", "scheduledDate": "", "meetingDone": true, "notes": "Visited on 2026-10-08 (Magrath Rd)", "scheduledToday": false}, {"id": "CP-025", "cpId": "2188", "name": "A M BHARATH KUMAR REDDY ( Space Properties )", "mobile": "7483531011", "rera": "PRM/KA/RERA/1251/309/AG/210902/002531", "address": "BUILDING NO 70 2 ND FLOOR 2 ND CROSS ESCORTS ENGINEERING LAYOUT YELAHANKA , BANGALORE , BENGALURU URBAN , KARNATAKA-560064", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8C: Yelahanka New Town & Ananthapura", "distKm": 21.0, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8C: Yelahanka New Town & Ananthapura. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-026", "cpId": "2208", "name": "KRIPA SHANKAR PANDEY (KSP Realty)", "mobile": "7481894616", "rera": "PRM/KA/RERA/1251/472/AG/240731/005020", "address": "12118, PRESTIGE ROYALE GARDENS, LEVEL-11, TOWER-12, AVALAHALLI, , DODDABALLAPUR ROAD, YELAHANAKA, BENGALURU , BENGALURU URBAN , KARNATAKA", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8D: Yelahanka, Kogilu & Bagalur Main Rd", "distKm": 22.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8D: Yelahanka, Kogilu & Bagalur Main Rd. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-027", "cpId": "2213", "name": "SENTIENT VENTURES AND TRADING PVT LTD", "mobile": "9742429282", "rera": "PRM/KA/RERA/1251/310/AG/241111/005218", "address": "NO 455/7, 15TH MAIN LAKKASANDRA , BENGALURU URBAN , KARNATAKA - 560030", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)", "cluster": "Cluster 3D: Dairy Circle, Madiwala & Lakkasandra", "distKm": 8.4, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "2026-10-14 (Jigani / Lakkasandra)", "scheduledDate": "", "meetingDone": true, "notes": "Visited on 2026-10-14 (Jigani / Lakkasandra)", "scheduledToday": false}, {"id": "CP-028", "cpId": "2243", "name": "Gunjan Kumar", "mobile": "9546017614", "rera": "PRM/KA/RERA/1251/310/AG/230228/003465", "address": "NO.726, 1ST FLOOR, 17TH CROSS,NEAR TO STONE PARK , DEVARACHIKKANAHALLI POST, BTM 4TH STAGE, BENGALURU , BENGALURU URBAN , KARNATAKA-560076", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)", "cluster": "Cluster 3C: Bilekahalli, Hulimavu & Gottigere", "distKm": 12.6, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 3C: Bilekahalli, Hulimavu & Gottigere. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-029", "cpId": "2262", "name": "ATHIRA VS", "mobile": "8123407504", "rera": "PRM/KA/RERA/1251/446/AG/250102/005329", "address": "FLAT NO., #202, SECOND FLOOR, SITE#86, SSN-2, MSR GREEN CITY LAYOUT, 1ST CROSS, VIJAYANAGAR, , WHITEFIELD, BANGALORE. , BENGALURU URBAN , KARNATAKA", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 1: Near Home (West & South-West)", "cluster": "Cluster 1A: Mysore Rd, Banashankari & Jayanagar", "distKm": 5.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Songbird Phase 2", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 1A: Mysore Rd, Banashankari & Jayanagar. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-030", "cpId": "2323", "name": "NARAYAN BARIK (Best Home Consulting)", "mobile": "9160635325", "rera": "PRM/KA/RERA/1251/310/AG/250917/006200", "address": "NO-11, 1ST CROSS ,EKADANTHA LAYOUT,PARAPPANA AGRAHARA ,BANGALORE SOUTH,PO-ELECTRONICS CITY , DIST-BENGALURU ,KARNATAKA ,560100 ,", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 5: Hosur Rd & Electronic City", "cluster": "Cluster 5A: Naganathapura, Rayasandra & E-City", "distKm": 19.5, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 5A: Naganathapura, Rayasandra & E-City. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-031", "cpId": "2324", "name": "A SAGAR (Trustline Realtors)", "mobile": "7899555877", "rera": "PRM/KA/RERA/1251/309/AG/261016/008017", "address": "NO1, 2ND STREET MARKHAM ROAD , ASHOK NAGAR ,VTC BANGALORE NORTH , , PO MUSEUM ROAD ,BENGALURU 560025 , BENGALURU URBAN , KARNATAKA", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 2: Central CBD & Infantry Rd", "cluster": "Cluster 2A: Infantry Rd & MG Rd Loop", "distKm": 7.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 2A: Infantry Rd & MG Rd Loop. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-032", "cpId": "2343", "name": "Priyanka Kumari", "mobile": "90190 97444", "rera": "ACK/KA/RERA/1251/446/AG/261017/008610", "address": "PR-Plaza, Site No. 01, Muneeshwara Regency,Flat No. 203W, 2nd Floor, Opp. MSR Crown Imperial , Kurdu-Sonnenahalli, Virgo Nagar, White Stone Boule , Bengaluru Urban , Karnataka 560049", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 6: East & Whitefield Corridor", "cluster": "Cluster 6C: Brookefield, Hoodi & Whitefield", "distKm": 22.4, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 1, "totalWalkins": 1, "projects": "Sattva Songbird Phase 2", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 6C: Brookefield, Hoodi & Whitefield. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-033", "cpId": "1982", "name": "PRIMENEST REALTY GLOBAL PRIVATE LIMITED", "mobile": "9740062748", "rera": "PRM/KA/RERA/1251/310/AG/260615/007379", "address": "NO. 208, 3RD FLOOR, SHRI SHARDA, 17TH E MAIN ROAD, 5TH BLOCK, KHB COLONY , BENGALURU URBAN , KARNATAKA - 560095", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4B: Koramangala & Ejipura Hub", "distKm": 10.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 4B: Koramangala & Ejipura Hub. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-034", "cpId": "1986", "name": "ULLAS RAYASAM", "mobile": "9035007003", "rera": "ACK/KA/RERA/1251/309/AG/260831/008349", "address": "1743, C BLOCK, , SAHAKARNAGAR , Bengaluru Urban , Karnataka - 560092", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)", "cluster": "Cluster 7C: Sahakarnagar, Vidyaranyapura & Nagasandra", "distKm": 15.6, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 7C: Sahakarnagar, Vidyaranyapura & Nagasandra. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-035", "cpId": "1998", "name": "RAJENDRA PRASAD K ( K K Real Estates)", "mobile": "7892946212", "rera": "PRM/KA/RERA/1250/303/AG/260902/007744", "address": "K.K. REAL ESTATES , BB ROAD , DEVANAHALLI TOWN , BANGALORE RURAL - 562110. , K.K. REAL ESTATES , BB ROAD , DEVANAHALLI TOWN. , BENGALURU RURAL , KARNATAKA-562110", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8E: Devanahalli & Doddaballapur (Near Vasanta Skye)", "distKm": 35.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8E: Devanahalli & Doddaballapur (Near Vasanta Skye). Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-036", "cpId": "2005", "name": "Veena (Adwog Propertiies)", "mobile": "9986353614", "rera": "PRM/KA/RERA/1251/309/AG/211027/002593", "address": "6TH CROSS, SRIRAMPURAM , BANGALORE , BENGALURU URBAN , KARNATAKA-560021", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 2: Central CBD & Infantry Rd", "cluster": "Cluster 2B: Srirampura, Malleshwaram & Yeshwanthpur", "distKm": 8.5, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 3, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 4, "projects": "Sattva City, Sattva Ekatra", "persona": "Favorite", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Strong Walk-in generator (4 walk-ins in Sattva City, Sattva Ekatra). Priority closure follow-up.", "scheduledToday": false}, {"id": "CP-037", "cpId": "2015", "name": "MAAVIA", "mobile": "9353579585", "rera": "PRM/KA/RERA/1251/446/AG/251004/006269", "address": "S/O MOHAMMED MOHSIN MUALLIM’S, JAMIA ABAD ROAD, , ABUBAKAR MASJID, BHATKAL-581320 , UTTARA KANNADA , KARNATAKA-581320", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 9: Outstation Karnataka", "cluster": "Cluster 9A: Outstation Tele-Followup", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva La Vita", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 9A: Outstation Tele-Followup. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-038", "cpId": "2018", "name": "Yash Chandra", "mobile": "9742881188", "rera": "PRM/KA/RERA/1251/446/AG/210122/002238", "address": "No 12 , Orange Tree, Next To Ryan International School, Brookefield , Bangalore , East Bangalore, Near Brookfield mall , Bangalore Urban", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 6: East & Whitefield Corridor", "cluster": "Cluster 6C: Brookefield, Hoodi & Whitefield", "distKm": 22.4, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 1, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Bliss", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 6C: Brookefield, Hoodi & Whitefield. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-039", "cpId": "2019", "name": "Ajith AN", "mobile": "9180212315", "rera": "ACK/KA/RERA/1251/309/AG/260907/008384", "address": "# 404 4th Cross Opp Widia , Vinayaka Nagar Nagasandra Post Bangalore , Bengaluru Urban , Karnataka - 560073", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)", "cluster": "Cluster 7C: Sahakarnagar, Vidyaranyapura & Nagasandra", "distKm": 15.6, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Songbird Phase 2", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 7C: Sahakarnagar, Vidyaranyapura & Nagasandra. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-040", "cpId": "2024", "name": "Kamal Kumar", "mobile": "8095500646", "rera": "PRM/KA/RERA/1251/310/AG/210802/002412", "address": "No 25, Ground Floor , New no 99, 5th Cross 8th main road , JC Nagar Mahalakshmipuram , Bengaluru North , Bengaluru Urban , Karnataka", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 2: Central CBD & Infantry Rd", "cluster": "Cluster 2B: Srirampura, Malleshwaram & Yeshwanthpur", "distKm": 8.5, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 2B: Srirampura, Malleshwaram & Yeshwanthpur. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-041", "cpId": "2033", "name": "AMBRESH", "mobile": "6363190583", "rera": "PRM/KA/RERA/1263/419/AG/260820/007690", "address": "003, P BLOCK, KHB GREEN PARK , OPPOSITE ITI COLLEGE, KALABURAGI , KALABURAGI , KARNATAKA-585101", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 9: Outstation Karnataka", "cluster": "Cluster 9A: Outstation Tele-Followup", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 9A: Outstation Tele-Followup. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-042", "cpId": "2039", "name": "RASOOL ASSOCIATES", "mobile": "9900243905", "rera": "PRM/KA/RERA/1251/446/AG/170824/000179", "address": "NO.100 , 3RD FLOOR , I.T.C COLONY COX TOWN ,BANGALORE 560005 , BENGALURU URBAN , KARNATAKA - 560005", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 2: Central CBD & Infantry Rd", "cluster": "Cluster 2C: Ulsoor, Cox Town & Banaswadi", "distKm": 11.4, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 2C: Ulsoor, Cox Town & Banaswadi. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-043", "cpId": "2042", "name": "SACHIN GURUNATH SANGUNDE", "mobile": "9740623464", "rera": "PRM/KA/RERA/1251/309/AG/230922/004129", "address": "NO,28 AMMABHAGVAN NILAYA DURGAPARMESHWARI LAYOUT , VIDYARANPURA BENGALURU , BENGALURU URBAN , KARNATAKA-560097", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)", "cluster": "Cluster 7C: Sahakarnagar, Vidyaranyapura & Nagasandra", "distKm": 15.6, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 7C: Sahakarnagar, Vidyaranyapura & Nagasandra. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-044", "cpId": "2045", "name": "NAYAN KUMAR MAHATO", "mobile": "7042732552", "rera": "PRM/KA/RERA/1251/446/AG/260423/007137", "address": "FLAT 302, SUPRIYA NEST , IBLUR VILLAGE , BENGALURU URBAN , KARNATAKA-560103", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4A: HSR Layout & Iblur Hub", "distKm": 13.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 4A: HSR Layout & Iblur Hub. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-045", "cpId": "2049", "name": "VETRIX REALTORS PRIVATE LIMITED", "mobile": "9611730045", "rera": "PRM/KA/RERA/1251/309/AG/260922/007898", "address": "41, 1ST FLOOR, RACHENAHALLI YELAHANKA, K R PURAM HOBLI, BENGALURU , BENGALURU URBAN , KARNATAKA - 560097", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8B: Thanisandra Main Rd & Bhartiya City Belt", "distKm": 18.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8B: Thanisandra Main Rd & Bhartiya City Belt. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-046", "cpId": "2052", "name": "VEERESH S ASUNDI", "mobile": "86940 11190", "rera": "PRM/KA/RERA/1262/430/AG/260204/006816", "address": "STATION ROAD, NEAR POLICE STATION QUATRAS , RANIBENNUR , HAVERI , KARNATAKA-581115", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 9: Outstation Karnataka", "cluster": "Cluster 9A: Outstation Tele-Followup", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "2026-10-14 (Sattva Forest Ridge)", "scheduledDate": "", "meetingDone": true, "notes": "Visited on 2026-10-14 (Sattva Forest Ridge)", "scheduledToday": false}, {"id": "CP-047", "cpId": "2067", "name": "RASHMI N S", "mobile": "9535579197", "rera": "PRM/KA/RERA/1251/309/AG/210807/002455", "address": "201/1, GROUND FLOOR, KAUSTUBH. 9TH CROSS,27TH MAIN BALAGERE ROAD, VARTHUR , BENGALURU URBAN , KARNATAKA-560087", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 6: East & Whitefield Corridor", "cluster": "Cluster 6B: Marathahalli, Balagere & Varthur", "distKm": 19.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 6B: Marathahalli, Balagere & Varthur. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-048", "cpId": "2074", "name": "AMITESH RAIKWAR", "mobile": "9713293846", "rera": "PRM/KA/RERA/1251/310/AG/250915/006184", "address": "PLOT 25, CK ADHITYA, NEAR INDLUVADI CROSS BUS STOP, ANEKAL JIGANI ROAD, ANEKAL, BENGALURU, BENGALURU URBAN, KARNATAKA-562106", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 5: Hosur Rd & Electronic City", "cluster": "Cluster 5A: Naganathapura, Rayasandra & E-City", "distKm": 19.5, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 5A: Naganathapura, Rayasandra & E-City. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-049", "cpId": "2078", "name": "LATHA H S (Loukya Ventures)", "mobile": "6362689521", "rera": "PRM/KA/RERA/1251/309/AG/240228/004557", "address": "W/O, HONNAGANGAIAH, 22, SHIRAGANAHALLI, MAGADI TALUK, , BENGALURU URBAN , KARNATAKA-562127", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 1: Near Home (West & South-West)", "cluster": "Cluster 1B: Nagarbhavi, Mallathahalli & Ullal", "distKm": 9.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 1B: Nagarbhavi, Mallathahalli & Ullal. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-050", "cpId": "2080", "name": "SOWMYA G (Vision Springs Realty)", "mobile": "7026613321", "rera": "PRM/KA/RERA/1251/472/AG/260825/007715", "address": "NO 70 15TH CROSS 1ST MAIN MARUTHINAGAR , MARUTHINAGAR YELAHANKA , BENGALURU URBAN , KARNATAKA-560064", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8D: Yelahanka, Kogilu & Bagalur Main Rd", "distKm": 22.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8D: Yelahanka, Kogilu & Bagalur Main Rd. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-051", "cpId": "2126", "name": "TRISHA ROY (Trish Realtors)", "mobile": "70336 28221", "rera": "PRM/KA/RERA/1251/310/AG/260921/007893", "address": "NO 49 REVATHI ELIGHT SARASWATHIPURA , HULIMAVU , BENGALURU URBAN , KARNATAKA-560076", "missingAddress": false, "createdBy": "NITESH KUMAR J", "zone": "Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)", "cluster": "Cluster 3C: Bilekahalli, Hulimavu & Gottigere", "distKm": 12.6, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 3C: Bilekahalli, Hulimavu & Gottigere. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-052", "cpId": "168", "name": "Jones Lang LaSalle Property Consultants (JLL)", "mobile": "8050044468", "rera": "PRM/KA/RERA/1251/446/AG/170914/000503", "address": "Level 14, Prestige Khoday Tower, Raj Bhavan / Infantry Rd, Bengaluru 560001 (Known)", "missingAddress": false, "createdBy": "Digital Nivasoft", "zone": "Zone 2: Central CBD & Infantry Rd", "cluster": "Cluster 2A: Infantry Rd & MG Rd", "distKm": 6.0, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 1, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 2, "projects": "Sattva Forest Ridge", "persona": "HNI", "lastVisited": "2026-10-22 (Infantry Rd)", "scheduledDate": "", "meetingDone": true, "notes": "Visited on 2026-10-22 (Infantry Rd)", "scheduledToday": false}, {"id": "CP-053", "cpId": "173", "name": "Propmart Technologies Limited", "mobile": "9743398814", "rera": "PRM/KA/RERA/1251/310/AG/170824/00023", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": true, "bookings2025": 2, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 2, "novWalkins": 0, "totalWalkins": 2, "projects": "Sattva Songbird Phase 2", "persona": "Favorite", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Strong Walk-in generator (2 walk-ins in Sattva Songbird Phase 2). Priority closure follow-up.", "scheduledToday": false}, {"id": "CP-054", "cpId": "180", "name": "AJAY SUTRADHAR", "mobile": "7411208508", "rera": "PRM/KA/RERA/1251/309/AG/210218/002271", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-055", "cpId": "193", "name": "PRJS - THE EMPIRE ESTATES PVT LTD", "mobile": "9148068999", "rera": "PRM/KA/RERA/1251/310/AG/230331/003555", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": true, "bookings2025": 2, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Past closer with 2 bookings in 2025. High-potential revival target.", "scheduledToday": false}, {"id": "CP-056", "cpId": "202", "name": "HUNDRED YARDS REALTOR PVT LTD", "mobile": "9916866667", "rera": "PRM/KA/RERA/1251/310/AG/231030/004229", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Bliss", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-057", "cpId": "206", "name": "MANOHARAN R", "mobile": "9539469809", "rera": "PRM/KA/RERA/1251/310/AG/240705/004945", "address": "-", "missingAddress": true, "createdBy": "Digital Nivasoft", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 6, "bookings2026": 0, "revSepCr": 1.23, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "HNI", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Past closer with 6 bookings in 2025. High-potential revival target.", "scheduledToday": false}, {"id": "CP-058", "cpId": "1340", "name": "PROPPULSE VENTURES PVT LTD", "mobile": "8197945500", "rera": "PRM/KA/RERA/1251/310/AG/240610/004850", "address": "20/1G, CHANDRA BAI L., MADIWALA, CHANDRA BAI L, BENGALURU, BENGALURU, 560029", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)", "cluster": "Cluster 3D: Dairy Circle, Madiwala & Lakkasandra", "distKm": 8.4, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 3D: Dairy Circle, Madiwala & Lakkasandra. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-059", "cpId": "1343", "name": "MOHAMMED SALAH", "mobile": "7624960800", "rera": "PRM/KA/RERA/1251/310/AG/230705/003756", "address": "253, SOBHA MORZARIA APARTMENT,NEAR DAIRLY CIRCLE , BANNERGHATTA MAIN ROAD , BENGALURU URBAN , KARNATAKA-560029", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)", "cluster": "Cluster 3D: Dairy Circle, Madiwala & Lakkasandra", "distKm": 8.4, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 3D: Dairy Circle, Madiwala & Lakkasandra. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-060", "cpId": "1348", "name": "ROHIT WADHWA", "mobile": "9019785088", "rera": "PRM/KA/RERA/1251/446/AG/260423/007149", "address": "20024, SOBHA DREAM ACRES, BALAGERE , VARTHUR, MAHADEVPURA, BENGALURU, KARNATAKA-560087", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 6: East & Whitefield Corridor", "cluster": "Cluster 6B: Marathahalli, Balagere & Varthur", "distKm": 19.8, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 6B: Marathahalli, Balagere & Varthur. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-061", "cpId": "1351", "name": "DREAMWEALTH REALTY LLP", "mobile": "9903718939", "rera": "PRM/KA/RERA/1251/309/AG/260131/006801", "address": "HAL OLD AIRPORT ROAD, HAL 2ND STAGE , BENGALURU, KARNATAKA - 560008", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 6: East & Whitefield Corridor", "cluster": "Cluster 6A: Indiranagar, Domlur & Old Airport Rd", "distKm": 12.5, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 6A: Indiranagar, Domlur & Old Airport Rd. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-062", "cpId": "1358", "name": "AMAN KUMAR JAIN", "mobile": "8949468054", "rera": "PRM/KA/RERA/1251/472/AG/250826/006060", "address": "CANOPY CREST IRS SR 503 , SY NO. 34/09 MARUTHI NAGAR KOGILU MAIN ROAD , BENGALURU URBAN , KARNATAKA-560064", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8D: Yelahanka, Kogilu & Bagalur Main Rd", "distKm": 22.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8D: Yelahanka, Kogilu & Bagalur Main Rd. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-063", "cpId": "1362", "name": "SESHA KALYAN MANYAM (Purestone Ventures LLP)", "mobile": "6362250744", "rera": "PRM/KA/RERA/1251/310/AG/250920/006234", "address": "C/O. M NAGANNA, 204, PURVA VANTAGE APARTMENT, , 19TH MAIN, SECTOR-2, HSR LAYOUT, BANGLORE SOUTH, , BENGALURU URBAN , KARNATAKA-560102", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4A: HSR Layout & Iblur Hub", "distKm": 13.2, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Aeropolis Phase II", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 4A: HSR Layout & Iblur Hub. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-064", "cpId": "1370", "name": "CHANDAN K E (Royalin Groups)", "mobile": "8884433353", "rera": "PRM/KA/RERA/1251/309/AG/251024/006402", "address": "NO 18 , BLUE TANG SWIMMING POOL ROAD BEHIND PSE COLLEGE , THIPPPENAHALLI , NAGASANDRA , BENGALURU , BENGALURU URBAN , KARNATAKA-560073", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)", "cluster": "Cluster 7C: Sahakarnagar, Vidyaranyapura & Nagasandra", "distKm": 15.6, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 7C: Sahakarnagar, Vidyaranyapura & Nagasandra. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-065", "cpId": "1383", "name": "SUGANDH SAURABH (SSS Estates)", "mobile": "8296335972", "rera": "PRM/KA/RERA/1251/310/AG/250514/005722", "address": "NO 148 , 1ST FLOOR NEAR BAYALU BASAVESHWARA TEMPLE , HOMMADEVANAHALLI, GOTTIGERE POST , BENGALURU URBAN , KARNATAKA-560083", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)", "cluster": "Cluster 3C: Bilekahalli, Hulimavu & Gottigere", "distKm": 12.6, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 3C: Bilekahalli, Hulimavu & Gottigere. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-066", "cpId": "1389", "name": "LAKEDGE TECHNOLOGIES PRIVATE LIMITED", "mobile": "8600774344", "rera": "PRM/KA/RERA/1251/446/AG/210807/002430", "address": "1ST FLOOR, 26/A, PATEL RAM REDDY RD, K.R.COLONY, KRISHNA REDDY LAYOUT, DOMLUR, BANGALURU , BENGALURU URBAN , KARNATAKA - 560071", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 6: East & Whitefield Corridor", "cluster": "Cluster 6A: Indiranagar, Domlur & Old Airport Rd", "distKm": 12.5, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 6A: Indiranagar, Domlur & Old Airport Rd. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-067", "cpId": "1392", "name": "G HEMANTH KUMAR REDDY", "mobile": "9108019889", "rera": "PRM/KA/RERA/1251/309/AG/250820/006048", "address": "NO 1, 1ST MAIN, 2ND CROSS, BEHIND ESTEEM MALL, CHIRANJEEVI LAYOUT , HEBBAL KEMPAPURA BANGLORE NORTH , BENGALURU URBAN , KARNATAKA-560024", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)", "cluster": "Cluster 7B: RT Nagar, Ganganagar & Hebbal Kempapura", "distKm": 12.8, "inActiveSheet": false, "bookings2025": 1, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Past closer with 1 bookings in 2025. High-potential revival target.", "scheduledToday": false}, {"id": "CP-068", "cpId": "1395", "name": "AVRIL COLLETTE SMITH", "mobile": "9874071892", "rera": "PRM/KA/RERA/1251/309/AG/251212/006613", "address": "NO. 10, GROUND FLOOR, KANAKASHAEELAYOUT,4TH MAIN, 6TH CROSS, BYRATHI,BENGALURU URBAN KARNATAKA-560077", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8A: Kalyan Nagar, Horamavu, Kothanur & Byrathi", "distKm": 16.5, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8A: Kalyan Nagar, Horamavu, Kothanur & Byrathi. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-069", "cpId": "1398", "name": "AKSHAY KUMAR C (Bhuh Ventures)", "mobile": "9731824644", "rera": "PRM/KA/RERA/1251/310/AG/250320/005582", "address": "#6 & 7, 1ST FLOOR, OPP GANESHA TEMPLE, NAGANATHAPURA , RAYASANDRA MAIN ROAD, ELECTRONIC CITY POST , BENGALURU URBAN , KARNATAKA-560100", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 5: Hosur Rd & Electronic City", "cluster": "Cluster 5A: Naganathapura, Rayasandra & E-City", "distKm": 19.5, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 5A: Naganathapura, Rayasandra & E-City. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-070", "cpId": "995", "name": "URBANNEXA CONSULTANTS LLP", "mobile": "9886388798", "rera": "PRM/KA/RERA/1251/472/AG/260305/006906", "address": "NO.1, AYANA TREE, DASARAHALLI MAIN ROAD, KEMPAPURA, HEBBAL , BENGALURU URBAN , KARNATAKA - 560024", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)", "cluster": "Cluster 7B: RT Nagar, Ganganagar & Hebbal Kempapura", "distKm": 12.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 7B: RT Nagar, Ganganagar & Hebbal Kempapura. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-071", "cpId": "1130", "name": "JOSEPH MATHEW", "mobile": "9972709770", "rera": "PRM/KA/RERA/1251/309/AG/260327/007020", "address": "NO 205, SANSKRUTHI APARTMENTS, K NARAYANAPURA MAIN ROAD, KOTHANUR POST, VTC- KOTHANUR, PO- KOTHANUR, BENGALURU URBAN, KARNATAKA", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8A: Kalyan Nagar, Horamavu, Kothanur & Byrathi", "distKm": 16.5, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8A: Kalyan Nagar, Horamavu, Kothanur & Byrathi. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-072", "cpId": "1134", "name": "Gopi (Bangalore Realtors)", "mobile": "8296383275", "rera": "PRM/KA/RERA/1263/423/AG/251103/006441", "address": "Kalaburagi, Karnataka", "missingAddress": true, "createdBy": "Madhu Menon", "zone": "Zone 9: Outstation Karnataka", "cluster": "Cluster 9A: Outstation Tele-Followup", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 3, "novWalkins": 0, "totalWalkins": 3, "projects": "Sattva City, Sattva Vasanta Skye", "persona": "Favorite", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Strong Walk-in generator (3 walk-ins in Sattva City, Sattva Vasanta Skye). Priority closure follow-up.", "scheduledToday": false}, {"id": "CP-073", "cpId": "1477", "name": "PATHAN ABDUL KAREEM", "mobile": "7829980041", "rera": "PRM/KA/RERA/1251/446/AG/230216/003431", "address": "NO. 28, 20TH I CROSS ROAD , GOWDA MUNISWAMY GARDEN, MARUTI FRESH MART, EJIPURA , BENGALURU URBAN , KARNATAKA-560047", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4B: Koramangala & Ejipura Hub", "distKm": 10.8, "inActiveSheet": false, "bookings2025": 1, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 1, "totalWalkins": 1, "projects": "Sattva Songbird Rowhouse", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Past closer with 1 bookings in 2025. High-potential revival target.", "scheduledToday": false}, {"id": "CP-074", "cpId": "1483", "name": "YASSAR SHARIFF (27 Estates)", "mobile": "8095799929", "rera": "PRM/KA/RERA/1251/309/AG/221230/003312", "address": "PRESTIGE COPPER ARCH, 83 INFANTRY ROAD , GROUND FLOOR 17 , BENGALURU RURAL , KARNATAKA-560001", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 2: Central CBD & Infantry Rd", "cluster": "Cluster 2A: Infantry Rd & MG Rd Loop", "distKm": 7.2, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 1, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Ekatra", "persona": "OK-OK", "lastVisited": "2026-10-13 & 2026-10-22 (Infantry Rd)", "scheduledDate": "", "meetingDone": true, "notes": "Visited on 2026-10-13 & 2026-10-22 (Infantry Rd)", "scheduledToday": true}, {"id": "CP-075", "cpId": "1492", "name": "SUBHAJIT BISWAS (Perfect Homz)", "mobile": "9741202106", "rera": "PRM/KA/RERA/1251/309/AG/210802/002417", "address": "356, 8TH CROSS, 6TH MAIN, MSR NAGAR , MATHIKERE POST, BANGALORE 560054 , BENGALURU URBAN , KARNATAKA-560054", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)", "cluster": "Cluster 7A: Sadashivanagar, RMV, Sanjaynagar & Mathikere", "distKm": 10.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 1, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Lumina", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 7A: Sadashivanagar, RMV, Sanjaynagar & Mathikere. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-076", "cpId": "1500", "name": "BRICKSTOHOME PRIVATE LIMITED", "mobile": "9036637778", "rera": "PRM/KA/RERA/1251/309/AG/260519/007260", "address": "HORAMAVU MAIN ROAD, HORAMAVU, BANGALORE NORTH, BANGALOR,KARNATAKA - 560043", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8A: Kalyan Nagar, Horamavu, Kothanur & Byrathi", "distKm": 16.5, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 1, "octWalkins": 2, "novWalkins": 1, "totalWalkins": 4, "projects": "Sattva Bliss, Sattva La Vita, Sattva Songbird", "persona": "Favorite", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Strong Walk-in generator (4 walk-ins in Sattva Bliss, Sattva La Vita, Sattva Songbird). Priority closure follow-up.", "scheduledToday": false}, {"id": "CP-077", "cpId": "1503", "name": "PROPSELLER INDIA PRIVATE LIMITED", "mobile": "9999081709", "rera": "PRM/KA/RERA/1251/472/AG/260619/007409", "address": "NO 15 A 303 2ND FLOOR BOMMASANDRA,YELAHANKA NEW TOWN , BENGALURU,KARNATAKA - 560054", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8C: Yelahanka New Town & Ananthapura", "distKm": 21.0, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 2, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 3, "projects": "Sattva City, Sattva Lumina", "persona": "Favorite", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Strong Walk-in generator (3 walk-ins in Sattva City, Sattva Lumina). Priority closure follow-up.", "scheduledToday": false}, {"id": "CP-078", "cpId": "1520", "name": "SUNNY JAISWAL", "mobile": "9341362203", "rera": "PRM/KA/RERA/1251/309/AG/240518/004766", "address": "NO.103 B BLOCK SHASHANK FLORENTO, SAMBHRAM COLLEGE ROAD,NEAR AMBABHAVANI TEMPLE ,DODDABETTAHALLI,BENGALURU-560097", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)", "cluster": "Cluster 7C: Sahakarnagar, Vidyaranyapura & Nagasandra", "distKm": 15.6, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 7C: Sahakarnagar, Vidyaranyapura & Nagasandra. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-079", "cpId": "1539", "name": "SUDHAKARA A (S L N ENTERPRISES)", "mobile": "9900935749", "rera": "PRM/KA/RERA/1250/303/AG/260605/007344", "address": "No.11, Lakshmi Nivas Ambika Arcade, Devanahalli, Bengaluru, Karnataka-562110", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8E: Devanahalli & Doddaballapur (Near Vasanta Skye)", "distKm": 35.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8E: Devanahalli & Doddaballapur (Near Vasanta Skye). Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-080", "cpId": "1543", "name": "SWARNIM REALTY PLUS", "mobile": "8296284127", "rera": "PRM/KA/RERA/1251/310/AG/260603/007320", "address": "23, 1ST FLOOR, SHREE JNANAPEETA, 2ND CROSS, NEW BANK COLONY, KONANAKUNTE , BENGALURU URBAN , KARNATAKA - 560062", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)", "cluster": "Cluster 3A: Konanakunte, Dodakallasandra & ISRO Layout", "distKm": 11.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 3A: Konanakunte, Dodakallasandra & ISRO Layout. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-081", "cpId": "1561", "name": "BUILDNEST REALTY PVT LTD", "mobile": "7406917711", "rera": "PRM/KA/RERA/1251/446/AG/210729/002406", "address": "23/175 MANJUNATH NILAYA 14TH CROSS 10TH MAIN MARUTHI NAGAR MALLESHPALYA BANGALORE MARUTI NGR , BENGALURU URBAN , KARNATAKA - 560075", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 6: East & Whitefield Corridor", "cluster": "Cluster 6A: Indiranagar, Domlur & Old Airport Rd", "distKm": 12.5, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 1, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva City", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 6A: Indiranagar, Domlur & Old Airport Rd. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-082", "cpId": "1571", "name": "DEV B SUNAR (NAYA HOMEZ)", "mobile": "9606256475", "rera": "PRM/KA/RERA/1251/310/AG/250920/006204", "address": "4014, PRESTIGE SONG OF SOUTH BEGUR KUPPA ROAD AKASHAYA VANA, NEAR INDIAN PETROL BUNK, BENGALURU, KARNATAKA-560068", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4C: BTM 2nd Stage, Bommanahalli & Begur", "distKm": 11.2, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 4C: BTM 2nd Stage, Bommanahalli & Begur. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-083", "cpId": "1577", "name": "ROHAN REALTY VENTURES PRIVATE LIMITED (HOME PLUS REALITY)", "mobile": "9663732659", "rera": "PRM/KA/RERA/1251/309/AG/230202/003405", "address": "D-1. FIRST FLOOR, RATHOD VATIKA, NO.25-3,INDUSTRIAL SUBURB, YESHWANTHPUR , BENGALURU URBAN , KARNATAKA - 560022", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 2: Central CBD & Infantry Rd", "cluster": "Cluster 2B: Srirampura, Malleshwaram & Yeshwanthpur", "distKm": 8.5, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva La Vita", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 2B: Srirampura, Malleshwaram & Yeshwanthpur. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-084", "cpId": "1254", "name": "NARESH KUMAR (NK Homes Creativity)", "mobile": "9591756756", "rera": "PRM/KA/RERA/1251/309/AG/260417/007121", "address": "R T Nagar, Bengaluru", "missingAddress": true, "createdBy": "Madhu Menon", "zone": "Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)", "cluster": "Cluster 7B: RT Nagar, Ganganagar & Hebbal Kempapura", "distKm": 12.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-085", "cpId": "1274", "name": "IMRAN KHAN R (GLOBAL REALTY)", "mobile": "8884070786", "rera": "PRM/KA/RERA/1251/309/AG/240120/004451", "address": "NO.13, 1ST FLOOR, 5TH B CROSS, BHOOPSANDRA MAIN ROAD, , RMV NEW EXTENSION SANJAYNAGAR BANGALORE , BENGALURU URBAN , KARNATAKA-560094", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)", "cluster": "Cluster 7A: Sadashivanagar, RMV, Sanjaynagar & Mathikere", "distKm": 10.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 7A: Sadashivanagar, RMV, Sanjaynagar & Mathikere. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-086", "cpId": "1319", "name": "ZAKIR ALI MISHRIKOTI (A-LINE REALITY)", "mobile": "8553618853", "rera": "PRM/KA/RERA/1251/309/AG/260428/007171", "address": "829/43, GROUND FLOOR , SHAIKS MANSION, 23, 6TH G MAIN ROAD , GAURAV NAGAR, JP NAGAR 7TH PHASE , BENGALURU KARNATAKA-580078", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)", "cluster": "Cluster 3B: JP Nagar 7th Phase & Vittal Nagar", "distKm": 10.5, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 3B: JP Nagar 7th Phase & Vittal Nagar. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-087", "cpId": "1328", "name": "SOUMYAA SUBIT BEHERA (Prop Forever)", "mobile": "9686944664", "rera": "PRM/KA/RERA/1251/309/AG/251031/006432", "address": "#31507 NIKOO HOME -1, BHARATIYA CITY , THANISANDRA, BEHIND BHARATIYA MALL OF BANGALORE , BENGALURU URBAN , KARNATAKA-560064", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8B: Thanisandra Main Rd & Bhartiya City Belt", "distKm": 18.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Park Cubix Phase II", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8B: Thanisandra Main Rd & Bhartiya City Belt. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-088", "cpId": "1331", "name": "MAYANK PRATAP SINGH (Prop Assetz)", "mobile": "6377371155", "rera": "PRM/KA/RERA/1251/309/AG/260119/006747", "address": "FLAT N0:A-1401,SMONDO 2.0 SHIKARIPALYA ELECTRONIC CITY NEO TOWN ROAD BENGALURU KARNATAKA-560100", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 5: Hosur Rd & Electronic City", "cluster": "Cluster 5A: Naganathapura, Rayasandra & E-City", "distKm": 19.5, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 5A: Naganathapura, Rayasandra & E-City. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-089", "cpId": "1676", "name": "R SAMRAT SINGH", "mobile": "8310233288", "rera": "PRM/KA/RERA/1250/301/AG/260131/006804", "address": "71 , KONGADIYAPPA MAIN ROAD CROSS , KUCCHAPPAPET DODBALLAPUR BANGALORE RURAL 561203 , BENGALURU RURAL , KARNATAKA-561203", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8E: Devanahalli & Doddaballapur (Near Vasanta Skye)", "distKm": 35.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8E: Devanahalli & Doddaballapur (Near Vasanta Skye). Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-090", "cpId": "1686", "name": "GOODWILL HOMES", "mobile": "9964996666", "rera": "PRM/KA/RERA/1251/309/AG/171113/000671", "address": "#265, 2ND FLOOR, 8TH CROSS, 1ST BLOCK, RT NAGAR , BENGALURU URBAN , KARNATAKA - 560032", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)", "cluster": "Cluster 7B: RT Nagar, Ganganagar & Hebbal Kempapura", "distKm": 12.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva City", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 7B: RT Nagar, Ganganagar & Hebbal Kempapura. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-091", "cpId": "1689", "name": "SRINIVAS SURESH GANDHI", "mobile": "9886009920", "rera": "PRM/KA/RERA/1251/309/AG/251208/006580", "address": "NO 4304 ANRIYA DWELLINGTON APT NO 1,1ST MAIN , RMV 2ND STAGE LOTTEGOLLAHALLI , BENGALURU URBAN , KARNATAKA-560094", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)", "cluster": "Cluster 7A: Sadashivanagar, RMV, Sanjaynagar & Mathikere", "distKm": 10.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 7A: Sadashivanagar, RMV, Sanjaynagar & Mathikere. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-092", "cpId": "1690", "name": "PROPERTY MAGAZINE PRIVATE LIMITED", "mobile": "9972291089", "rera": "PRM/KA/RERA/1251/309/AG/251202/006559", "address": "NO.88/712, 2ND FLOOR, 2ND STAGE NGEF LAYOUT, NAGARBHAVI , BENGALURU URBAN , KARNATAKA - 560072.", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 1: Near Home (West & South-West)", "cluster": "Cluster 1B: Nagarbhavi, Mallathahalli & Ullal", "distKm": 9.2, "inActiveSheet": false, "bookings2025": 1, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Past closer with 1 bookings in 2025. High-potential revival target.", "scheduledToday": false}, {"id": "CP-093", "cpId": "1696", "name": "IMTIAZ PASHA(XPERT BROKERS AND CONSULTANTS)", "mobile": "8431193003", "rera": "PRM/KA/RERA/1251/309/AG/250811/005897", "address": "NO 82 SANA ENCLAVE BSF CROSS ROAD SATHNUR VILLAGE , YELAHANKA , BENGALURU URBAN , KARNATAKA-560064", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8D: Yelahanka, Kogilu & Bagalur Main Rd", "distKm": 22.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8D: Yelahanka, Kogilu & Bagalur Main Rd. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-094", "cpId": "1700", "name": "BRIDGEKEYS INFRATECH PRIVATE LIMITED", "mobile": "6364466801", "rera": "PRM/KA/RERA/1251/446/AG/230427/003607", "address": "#31/4/1, BALAGERE BENGALURU URBAN , KARNATAKA - 560087", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 6: East & Whitefield Corridor", "cluster": "Cluster 6B: Marathahalli, Balagere & Varthur", "distKm": 19.8, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 6B: Marathahalli, Balagere & Varthur. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-095", "cpId": "1707", "name": "SKYNEST VENTURES PRIVATE LIMITED", "mobile": "6364621274", "rera": "PRM/KA/RERA/1251/309/AG/251208/006565", "address": "NO, 06, GROUND FLOOR, BUDIGERE ROAD, CHIKKATHIMMAIAH LAYOUT SHANTHI NAGAR,DEVANAHALI TOWN, BENGALURU RURAL, KARNATAKA -562110", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8E: Devanahalli & Doddaballapur (Near Vasanta Skye)", "distKm": 35.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8E: Devanahalli & Doddaballapur (Near Vasanta Skye). Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-096", "cpId": "1713", "name": "REVATHI K", "mobile": "8792797309", "rera": "PRM/KA/RERA/1251/446/AG/250917/006202", "address": "#9, 12TH A CROSS,16TH MAIN BTM LAYOUT 2ND STAGE BANGALORE BENGALURU URBAN, KARNATAKA-560076", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4C: BTM 2nd Stage, Bommanahalli & Begur", "distKm": 11.2, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 4C: BTM 2nd Stage, Bommanahalli & Begur. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-097", "cpId": "1716", "name": "R SANDEEP", "mobile": "9363617743", "rera": "PRM/KA/RERA/1251/446/AG/240715/004962", "address": "MESTRIPALYA HOUSE 19 , KORMANGALA 3RD BLOCK BENGALURU -BENGALURU URBAN , KARNATAKA-560034", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4B: Koramangala & Ejipura Hub", "distKm": 10.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 4B: Koramangala & Ejipura Hub. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-098", "cpId": "1719", "name": "VESTAWISSE CONSULTANT LLP", "mobile": "9740582775", "rera": "PRM/KA/RERA/1251/310/AG/251009/006318", "address": "NO.17/18 , NRUPATHUNGA NAGAR,KOTHNUR MAIN ROAD , J P NAGAR J P NAGAR POLICE STATION,BANGLORE SOUTH BENGALURU URBAN , KARNATAKA - 560078", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)", "cluster": "Cluster 3B: JP Nagar 7th Phase & Vittal Nagar", "distKm": 10.5, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 3B: JP Nagar 7th Phase & Vittal Nagar. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-099", "cpId": "1722", "name": "ANTONY ROBERT FRANK (Crest Luxe Realty)", "mobile": "9108266752", "rera": "PRM/KA/RERA/1251/446/AG/251016/006330", "address": "NO. 16 CASA DIVINE MERCY, 2ND CROSS, KR AMOGHA RESIDENTIAL KAMMASANDRA, BIDRAHALLI BENGALURU-560049", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 6: East & Whitefield Corridor", "cluster": "Cluster 6C: Brookefield, Hoodi & Whitefield", "distKm": 22.4, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 6C: Brookefield, Hoodi & Whitefield. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-100", "cpId": "1726", "name": "NESTAWAY TECHNOLOGIES PRIVATE LIMITED", "mobile": "9354079208", "rera": "PRM/KA/RERA/1251/310/AG/190125/001246", "address": "556, TATTVAM, GROUND FLOOR, 14TH MAIN ROAD, SECTOR 7, HSR LAYOUT , BENGALURU URBAN KARNATAKA - 560102", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4A: HSR Layout & Iblur Hub", "distKm": 13.2, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 4A: HSR Layout & Iblur Hub. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-101", "cpId": "1735", "name": "MOHAMMED FAIZAN", "mobile": "9019556507", "rera": "PRM/KA/RERA/1251/309/AG/251009/006314", "address": "NO 46 & 47, 1ST CROSS , DURGAMBA ROAD , AMARJYOTHI LAYOUT,EXTENTION, THANISANDHARA SHIVARAMKARANTH NAGAR POST BANGALORE 560077", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8B: Thanisandra Main Rd & Bhartiya City Belt", "distKm": 18.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8B: Thanisandra Main Rd & Bhartiya City Belt. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-102", "cpId": "1740", "name": "CHANNELEDIN REAL ESTATE LLP", "mobile": "72047 23534", "rera": "PRM/KA/RERA/1251/310/AG/221029/003191", "address": "227, 2ND FLOOR, 37TH CROSS, 11TH MAIN, 4TH BLOCK, JAYANAGAR, BANGALORE, KARNATAKA-560041", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 1: Near Home (West & South-West)", "cluster": "Cluster 1A: Mysore Rd, Banashankari & Jayanagar", "distKm": 5.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 1A: Mysore Rd, Banashankari & Jayanagar. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-103", "cpId": "1744", "name": "Tanveer Yossuf (Earth Realty)", "mobile": "9945594445", "rera": "PRM/KA/RERA/1251/310/AG/260902/007742", "address": "13, 2nd Main, Kattriguppe Main Road , Banashankari 3rdStage, Bangalore , Bengaluru Urban , Karnataka - 560085", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 1: Near Home (West & South-West)", "cluster": "Cluster 1A: Mysore Rd, Banashankari & Jayanagar", "distKm": 5.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 1A: Mysore Rd, Banashankari & Jayanagar. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-104", "cpId": "1432", "name": "NEXT FOOTSTEP PRIVATE LIMITED", "mobile": "9900111419", "rera": "PRM/KA/RERA/1251/309/AG/210415/002404", "address": "NO.1064, APARTMENT NO 302, 21ST CROSS ROAD, SECTOR 7, HSR LAYOUT BANGALORE, KARNATAKA, INDIA -560102 , BENGALURU URBAN , KARNATAKA - 560102", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4A: HSR Layout & Iblur Hub", "distKm": 13.2, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 2, "novWalkins": 0, "totalWalkins": 2, "projects": "Sattva Aeropolis Phase II", "persona": "Favorite", "lastVisited": "2026-10-09 (HSR Sector 1/7)", "scheduledDate": "", "meetingDone": true, "notes": "Visited on 2026-10-09 (HSR Sector 1/7)", "scheduledToday": false}, {"id": "CP-105", "cpId": "1435", "name": "THEE HOUSE OF REAL ESTATE SOLUTIONS PRIVATE LTD", "mobile": "9547639626", "rera": "PRM/KA/RERA/1251/309/AG/250820/006021", "address": "91 ADDRESS MAKER BUSINESS HUB PRIVATE LIMITED, GOPALA KRISHNA COMPLEX 45/3 SRIRAMPURA, THANISANDRA , BENGALURU URBAN , KARNATAKA - 560064", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8B: Thanisandra Main Rd & Bhartiya City Belt", "distKm": 18.2, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8B: Thanisandra Main Rd & Bhartiya City Belt. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-106", "cpId": "1441", "name": "HARJOT SINGH(PROMENADE 360)", "mobile": "9845301790", "rera": "PRM/KA/RERA/1251/310/AG/260103/006682", "address": "NO.12, AKSHAYA RESIDENCY, DOOR NUMBER 109, 5TH FLOOR, 1ST CROSS, 1ST MAIN, , SRI GURURAGHAVENDRA NAGAR, J P NAGAR 7TH PHASE , BENGALURU KARNATKA 560076", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)", "cluster": "Cluster 3B: JP Nagar 7th Phase & Vittal Nagar", "distKm": 10.5, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 3B: JP Nagar 7th Phase & Vittal Nagar. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-107", "cpId": "1444", "name": "SYED MUDASIR", "mobile": "8951367640", "rera": "PRM/KA/RERA/1251/446/AG/240228/004578", "address": "BANGALORE,KARTNATAKA-560053", "missingAddress": true, "createdBy": "Madhu Menon", "zone": "Zone 1: Near Home (West & South-West)", "cluster": "Cluster 1A: Mysore Rd / Chickpet / Jayanagar", "distKm": 4.5, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-108", "cpId": "1450", "name": "JUNAID KHAN", "mobile": "9164760990", "rera": "PRM/KA/RERA/1251/310/AG/260402/007040", "address": "#240 1ST MAIN ROAD 5TH CROSS , VALMIKINAGAR MYSORE ROAD BENGALURU , KARNATAKA-560026", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 1: Near Home (West & South-West)", "cluster": "Cluster 1A: Mysore Rd, Banashankari & Jayanagar", "distKm": 5.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 2, "novWalkins": 0, "totalWalkins": 2, "projects": "Sattva Aangane, Sattva Songbird Phase 2", "persona": "Favorite", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Strong Walk-in generator (2 walk-ins in Sattva Aangane, Sattva Songbird Phase 2). Priority closure follow-up.", "scheduledToday": true}, {"id": "CP-109", "cpId": "1453", "name": "CRAZY ASSETS REALTORS PVT. LTD.", "mobile": "7975247308", "rera": "PRM/KA/RERA/1251/309/AG/230816/003985", "address": "# 198,2ND FLOOR, CMH ROAD,INDIRA NAGAR, STAGE II INDIRANAGAR (BANGALORE),BANGALORE NORTH, BANGALORE , BENGALURU URBAN , KARNATAKA - 560038", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 6: East & Whitefield Corridor", "cluster": "Cluster 6A: Indiranagar, Domlur & Old Airport Rd", "distKm": 12.5, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 1, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 2, "projects": "Sattva Lumina, Sattva Park Cubix Phase II", "persona": "Favorite", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Strong Walk-in generator (2 walk-ins in Sattva Lumina, Sattva Park Cubix Phase II). Priority closure follow-up.", "scheduledToday": false}, {"id": "CP-110", "cpId": "1456", "name": "PRASAD V KUMBAR(ACCENTRA)", "mobile": "7899289849", "rera": "PRM/KA/RERA/1251/472/AG/250110/005382", "address": "NO 31 SHREE KRISHNA GARDEN OPP SK APARTMENT ,KATTIGENAHALLI YELAHANKA,BENGALURU KARNATAKA-560064", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8D: Yelahanka, Kogilu & Bagalur Main Rd", "distKm": 22.8, "inActiveSheet": true, "bookings2025": 4, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "HNI", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Past closer with 4 bookings in 2025. High-potential revival target.", "scheduledToday": false}, {"id": "CP-111", "cpId": "1462", "name": "BLOX RESIDENTIALS PRIVATE LIMITED", "mobile": "9738563155", "rera": "PRM/KA/RERA/1251/309/AG/230705/003740", "address": "103 DHARMANNA GARDENS DINNUR R T NAGAR POST, BENGALURU URBAN KARNATAKA 560032", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)", "cluster": "Cluster 7B: RT Nagar, Ganganagar & Hebbal Kempapura", "distKm": 12.8, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva City", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 7B: RT Nagar, Ganganagar & Hebbal Kempapura. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-112", "cpId": "1474", "name": "MANJUNATH R", "mobile": "9535321356", "rera": "PRM/KA/RERA/1251/310/AG/220429/002864", "address": "NO34, 6TH CROSS 1ST MAIN ROAD GOVT PRESS LAYOUT , ULLAL MAIN ROAD , BENGALURU URBAN , KARNATAKA-560056", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 1: Near Home (West & South-West)", "cluster": "Cluster 1B: Nagarbhavi, Mallathahalli & Ullal", "distKm": 9.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 1B: Nagarbhavi, Mallathahalli & Ullal. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-113", "cpId": "1480", "name": "PROPFOLIOMANAGER TECHNOLOGIES PRIVATE LIMITED", "mobile": "9845615901", "rera": "PRM/KA/RERA/1251/446/AG/180611/000962", "address": "NO.8, MSO COLONY, BANASWADI MAIN ROAD JAI BHARATH NAGAR, BENGALURU, BENGALURU URBAN, , BENGALURU URBAN , KARNATAKA - 560033", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 2: Central CBD & Infantry Rd", "cluster": "Cluster 2C: Ulsoor, Cox Town & Banaswadi", "distKm": 11.4, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 2C: Ulsoor, Cox Town & Banaswadi. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-114", "cpId": "1861", "name": "HOMELYNK REALTY LLP", "mobile": "7289062707", "rera": "PRM/KA/RERA/1251/472/AG/240628/004912", "address": "2ND FLOOR.303, 15TH A CROSS ROAD, CHIKKA BOMMASANDRA MAIN RD YELAHANKA NEW TOWN, BENGALURU, KARNATAKA , BENGALURU URBAN , KARNATAKA - 560064", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8C: Yelahanka New Town & Ananthapura", "distKm": 21.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8C: Yelahanka New Town & Ananthapura. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-115", "cpId": "1864", "name": "SANDESH BASAVARAJ(SPACE GROWTH REALTY)", "mobile": "9035367373", "rera": "PRM/KA/RERA/1251/310/AG/251129/006543", "address": "NO 41 AND 42/4 G FLOOR, 2ND MAIN, NEAR NATIONAL CONVENT SCHOOL , VITTAL NAGAR 2ND STAGE , BANGALORE SOUTH , BENGALURU URBAN , KARNATAKA-560078", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)", "cluster": "Cluster 3B: JP Nagar 7th Phase & Vittal Nagar", "distKm": 10.5, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 3B: JP Nagar 7th Phase & Vittal Nagar. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-116", "cpId": "1867", "name": "HARISH KUMAR S", "mobile": "9731688122", "rera": "PRM/KA/RERA/1251/310/AG/240920/005128", "address": "#59/10, 2ND CROSS, VENKATESHWARA LAYOUT , BANGALORE SOUTH, DHARMARAM COLLAGE , BENGALURU URBAN , KARNATAKA-560029", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)", "cluster": "Cluster 3D: Dairy Circle, Madiwala & Lakkasandra", "distKm": 8.4, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 3D: Dairy Circle, Madiwala & Lakkasandra. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-117", "cpId": "1871", "name": "ARVIND BHATNAGAR", "mobile": "9972349115", "rera": "PRM/KA/RERA/1251/309/AG/260817/007679", "address": "13, 3RD MAIN ROAD, SIVA SHANKAR LAYOUT, BAGALUR MAIN ROAD, YELAHANKA, BENGALURU-560063", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8D: Yelahanka, Kogilu & Bagalur Main Rd", "distKm": 22.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8D: Yelahanka, Kogilu & Bagalur Main Rd. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-118", "cpId": "1885", "name": "TRUSTBUILT TECHNOLOGIES PRIVATE LIMITED", "mobile": "9513262262", "rera": "PRM/KA/RERA/1251/309/AG/251113/006462", "address": "2201A WORLD TRADE CENTRE BRIGADE GATEWAY CAMPUS, MALLESHWARAM WEST , BENGALURU URBAN , KARNATAKA - 560055", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 2: Central CBD & Infantry Rd", "cluster": "Cluster 2B: Srirampura, Malleshwaram & Yeshwanthpur", "distKm": 8.5, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 2B: Srirampura, Malleshwaram & Yeshwanthpur. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-119", "cpId": "1888", "name": "KARTHIK KUMAR M A (Prorise Bangalore)", "mobile": "6360466096", "rera": "PRM/KA/RERA/1265/341/AG/260326/007009", "address": "SOMAYAJILAHALLI VILLAGE AND POST SRINIVASPURA TALUK , SOMAYAJILAPALLI , KOLAR , KARNATAKA-563138", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 9: Outstation Karnataka", "cluster": "Cluster 9A: Outstation Tele-Followup", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 9A: Outstation Tele-Followup. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-120", "cpId": "1890", "name": "JAGANNATH VENKAT C SITARAMA CHERUKURI", "mobile": "9880457518", "rera": "PRM/KA/RERA/1251/310/AG/251021/006366", "address": "L 1102, LYDIA WEST WING, SNN RAJ LAKE VIEW APARTMENTS - PHASE 1, BTM 2ND STAGE, , 29TH MAIN, NS PALYA MAIN ROAD, BANGALORE - 560076", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4C: BTM 2nd Stage, Bommanahalli & Begur", "distKm": 11.2, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "2026-10-13 (BTM Layout)", "scheduledDate": "", "meetingDone": true, "notes": "Visited on 2026-10-13 (BTM Layout)", "scheduledToday": false}, {"id": "CP-121", "cpId": "1891", "name": "Sangeeta", "mobile": "6360915611", "rera": "PRM/KA/RERA/1252/473/AG/241212/005311", "address": "Bidar, Karnataka", "missingAddress": true, "createdBy": "Madhu Menon", "zone": "Zone 9: Outstation Karnataka", "cluster": "Cluster 9A: Outstation Tele-Followup", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-122", "cpId": "1895", "name": "PREETI CHAVAN", "mobile": "9449283249", "rera": "PRM/KA/RERA/1275/448/AG/260123/006776", "address": "3RD CROSS SHIVAJI PETH , BIJAPUR , VIJAYAPURA , KARNATAKA-586101", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 9: Outstation Karnataka", "cluster": "Cluster 9A: Outstation Tele-Followup", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 9A: Outstation Tele-Followup. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-123", "cpId": "1898", "name": "PROPFINDER", "mobile": "8870260750", "rera": "PRM/KA/RERA/1251/310/AG/260109/006694", "address": "32/1, 9TH MAIN, 6TH SECTOR, HSR LAYOUT , BENGALURU URBAN , KARNATAKA - 560102", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4A: HSR Layout & Iblur Hub", "distKm": 13.2, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 4A: HSR Layout & Iblur Hub. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-124", "cpId": "1902", "name": "Billionaire Dream Estate Private Limited", "mobile": "9071371005", "rera": "PRM/KA/RERA/1251/446/AG/250514/005727", "address": "Bangalore", "missingAddress": true, "createdBy": "Madhu Menon", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - City Name Only", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-125", "cpId": "1909", "name": "VASANTH H U (Vivarsh Realty)", "mobile": "6361823204", "rera": "PRM/KA/RERA/1251/310/AG/250523/005781", "address": "#170/2A BEHIND DURGIGUDI MAHALAKSHMI , HONNALI , DAVANGERE , KARNATAKA-577217", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 9: Outstation Karnataka", "cluster": "Cluster 9A: Outstation Tele-Followup", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 9A: Outstation Tele-Followup. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-126", "cpId": "1912", "name": "HOUSING YARD PRIVATE LIMITED", "mobile": "9741680606", "rera": "PRM/KA/RERA/1251/310/AG/230321/003512", "address": "Koramangala, Bangalore", "missingAddress": true, "createdBy": "Madhu Menon", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4B: Koramangala & Ejipura Hub", "distKm": 10.8, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-127", "cpId": "1922", "name": "SMITHA K N (Golden Nest Properties)", "mobile": "9916341326", "rera": "PRM/KA/RERA/1251/309/AG/230705/003788", "address": "NO-24, 2ND CROSS, OPP. SAMBRAM COLLEGE, ANUGRAHA LAYOUT, VIDYARANYAPURA, BENGALURU, KARNATAKA-560097", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)", "cluster": "Cluster 7C: Sahakarnagar, Vidyaranyapura & Nagasandra", "distKm": 15.6, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 7C: Sahakarnagar, Vidyaranyapura & Nagasandra. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-128", "cpId": "1930", "name": "SKYROS ESTATES (OPC) PRIVATE LIMITED", "mobile": "8970785001", "rera": "PRM/KA/RERA/1251/310/AG/240610/004856", "address": "WEWORK PRESTIGE ATLANTA, SOFTWARE INDUSTRY, NO.10/12,80 FEET MAIN ROAD, 1A BLOCK KORAMANGALA 3RD BLOCK ,BANGALORE-560034 , BENGALURU URBAN , KARNATAKA - 560034", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4B: Koramangala & Ejipura Hub", "distKm": 10.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Aqua Vista", "persona": "Favorite", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 4B: Koramangala & Ejipura Hub. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-129", "cpId": "1587", "name": "SUMIT KARMAKAR (Propz Realty)", "mobile": "8792996001", "rera": "PRM/KA/RERA/1251/446/AG/210318/002328", "address": "#824 , 1ST BLOCK HRBR LAYOUT, 5TH A CROSS KALYAN NAGAR , BENGALURU URBAN , KARNATAKA-566043", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8A: Kalyan Nagar, Horamavu, Kothanur & Byrathi", "distKm": 16.5, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8A: Kalyan Nagar, Horamavu, Kothanur & Byrathi. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-130", "cpId": "1597", "name": "MOHAMMED SHAHNAWAZ KAZIA (Planet Prop Reality)", "mobile": "9986365884", "rera": "PRM/KA/RERA/1251/446/AG/170824/000022", "address": "G-04, YASHILA APARTMENTS, 1ST MAIN ROAD 8TH BLOCK, KORAMANGALA , BENGALURU URBAN , KARNATAKA-560095", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4B: Koramangala & Ejipura Hub", "distKm": 10.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 4B: Koramangala & Ejipura Hub. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-131", "cpId": "1613", "name": "PROPGLOBAS REALTY", "mobile": "9019082372", "rera": "PRM/KA/RERA/1251/310/AG/260522/007267", "address": "#1053, 22nd Cross, 22nd Main, 2nd Sector, HSR Layout, Bangalore, Karnataka-560102", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4A: HSR Layout & Iblur Hub", "distKm": 13.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 1, "octWalkins": 0, "novWalkins": 1, "totalWalkins": 2, "projects": "Sattva City, Sattva Park Cubix Phase II", "persona": "Favorite", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Strong Walk-in generator (2 walk-ins in Sattva City, Sattva Park Cubix Phase II). Priority closure follow-up.", "scheduledToday": false}, {"id": "CP-132", "cpId": "1616", "name": "SIDDE GOWDA HB", "mobile": "8050523008", "rera": "PRM/KA/RERA/1251/310/AG/171114/000934", "address": "154, 1ST A Main Road, Shakti Garden, Nagabharavi Main Road, Bangalore-560072", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 1: Near Home (West & South-West)", "cluster": "Cluster 1B: Nagarbhavi, Mallathahalli & Ullal", "distKm": 9.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 1, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Forest Ridge", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 1B: Nagarbhavi, Mallathahalli & Ullal. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-133", "cpId": "1620", "name": "EARTH6 REALTY CONNECT PVT LTD", "mobile": "9741118892", "rera": "PRM/KA/RERA/1251/306/AG/231108/004238", "address": "-", "missingAddress": true, "createdBy": "Madhu Menon", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Dead", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-134", "cpId": "1635", "name": "SRIKANTH (Spacedraw Properties)", "mobile": "9353580609", "rera": "PRM/KA/RERA/1251/309/AG/230705/003778", "address": "NO 15 2ND CROSS VITTAL VALLEY , NEAR BESCOM ISRO LAYOUT , BENGALURU URBAN , KARNATAKA-560111", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)", "cluster": "Cluster 3A: Konanakunte, Dodakallasandra & ISRO Layout", "distKm": 11.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 3A: Konanakunte, Dodakallasandra & ISRO Layout. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-135", "cpId": "1641", "name": "NAGENDRA V (Exquisite Homes)", "mobile": "9008373636", "rera": "PRM/KA/RERA/1251/310/AG/260131/006803", "address": "#64/39, SRI MANJUNATHA NILAYA, 1ST MAIN, 1ST CROSS, KATTARIGUPPE MAIN ROAD , VIVEKANANDA NAGARA, BANASHANKARI 3RD STAGE , BENGALURU, KARNATAKA-560085", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 1: Near Home (West & South-West)", "cluster": "Cluster 1A: Mysore Rd, Banashankari & Jayanagar", "distKm": 5.8, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 1, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Forest Ridge", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 1A: Mysore Rd, Banashankari & Jayanagar. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": true}, {"id": "CP-136", "cpId": "1645", "name": "LUXURY ROOF PRIVATE LIMITED", "mobile": "9990926027", "rera": "PRM/KA/RERA/1251/309/AG/240518/004775", "address": "HD-215, WE WORK PRESTIGE CENTRAL 36, INFANTRY ROAD, BENGALURU , BENGALURU URBAN , KARNATAKA - 560001", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 2: Central CBD & Infantry Rd", "cluster": "Cluster 2A: Infantry Rd & MG Rd Loop", "distKm": 7.2, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "HNI", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 2A: Infantry Rd & MG Rd Loop. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-137", "cpId": "1653", "name": "AHMED WAQAS(Raw Estates)", "mobile": "9035536989", "rera": "PRM/KA/RERA/1274/353/AG/260131/006793", "address": "HANEEFABAD 5TH CROSS BHATKAL HEBLE KARNATAKA, UTTARA KANNADA, KARNATAKA-581320", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 9: Outstation Karnataka", "cluster": "Cluster 9A: Outstation Tele-Followup", "distKm": 0.0, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 9A: Outstation Tele-Followup. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-138", "cpId": "1656", "name": "SUMESH AROLI", "mobile": "9495520327", "rera": "PRM/KA/RERA/1251/309/AG/210331/002371", "address": "CENTURY COMMANDERS VISTA, BLDG- A2-114, ANATHAPURA , YELAHANKA NEW TOWN , BENGALURU URBAN , KARNATAKA-560064", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8C: Yelahanka New Town & Ananthapura", "distKm": 21.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8C: Yelahanka New Town & Ananthapura. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-139", "cpId": "1660", "name": "R DEEKSHITH PAWAR (Prop Pearl)", "mobile": "7338087887", "rera": "PRM/KA/RERA/1250/303/AG/230922/004120", "address": "WARD NO 9, GANDHI BAJAR ROAD, DEVANAHALLI TALUK, BANGALORE RURAL VIJAYAPURA , DEVANAHALLI TALUK BANGALORE RURAL , BENGALURU RURAL ,", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 9: Outstation Karnataka", "cluster": "Cluster 9A: Outstation Tele-Followup", "distKm": 0.0, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 9A: Outstation Tele-Followup. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-140", "cpId": "1664", "name": "RAJ KUMAR RAUTH", "mobile": "8197638679", "rera": "PRM/KA/RERA/1251/309/AG/260514/007241", "address": "NO. 9, 5TH CROSS , LAKSHMIPURAM HALASURU, BENGALURU NORTH , BENGALURU URBAN , KARNATAKA-560008", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 2: Central CBD & Infantry Rd", "cluster": "Cluster 2C: Ulsoor, Cox Town & Banaswadi", "distKm": 11.4, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Songbird Phase 2", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 2C: Ulsoor, Cox Town & Banaswadi. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-141", "cpId": "1669", "name": "SESHADRI T S (Tirumakudalu Properties)", "mobile": "9741111756", "rera": "PRM/KA/RERA/1251/310/AG/200902/002011", "address": "78, 2ND CROSS, S B M COLONY, KONANAKUNTE,KONANKUNTE , BENGALURU URBAN , KARNATAKA-560062", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)", "cluster": "Cluster 3A: Konanakunte, Dodakallasandra & ISRO Layout", "distKm": 11.8, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 3A: Konanakunte, Dodakallasandra & ISRO Layout. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-142", "cpId": "1673", "name": "AVINASH (Round Nest Realty)", "mobile": "9902283628", "rera": "PRM/KA/RERA/1251/310/AG/250523/005801", "address": "32,2A MAIN ROAD,GOWRAMMA ROAD,NEAR SBI BANK , ANANTHAPURA,YELAHANKA POST , BENGALURU URBAN , KARNATAKA-560064", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8C: Yelahanka New Town & Ananthapura", "distKm": 21.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8C: Yelahanka New Town & Ananthapura. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-143", "cpId": "1759", "name": "VIKRAM RAY (Dream Homez)", "mobile": "8971666219", "rera": "PRM/KA/RERA/1251/308/AG/260417/007125", "address": "B-006, GROUND FLOOR, GR, SITARA SY NO 9/3 DODDAMARA ROAD , NEAR MAHAVIR RANCHES, RAYASANDRA, ELECTRONICS CITY , BENGALURU URBAN , KARNATAKA", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 5: Hosur Rd & Electronic City", "cluster": "Cluster 5A: Naganathapura, Rayasandra & E-City", "distKm": 19.5, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 5A: Naganathapura, Rayasandra & E-City. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-144", "cpId": "1767", "name": "YOHMS REALTY PVT LTD", "mobile": "8884898987", "rera": "PRM/KA/RERA/1251/446/AG/230427/003609", "address": "#1074, SHREYAS, CHURCH ROAD, 7TH MAIN, NEW THIPPASANDRA BANGALORE , BENGALURU URBAN , KARNATAKA - 560075", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 6: East & Whitefield Corridor", "cluster": "Cluster 6A: Indiranagar, Domlur & Old Airport Rd", "distKm": 12.5, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva La Vita", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 6A: Indiranagar, Domlur & Old Airport Rd. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-145", "cpId": "1773", "name": "SHYAMLAL RAVI (Dwellz N Castlez)", "mobile": "8550844847", "rera": "PRM/KA/RERA/1251/310/AG/240610/004848", "address": "Bangalore", "missingAddress": true, "createdBy": "Madhu Menon", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - City Name Only", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-146", "cpId": "1776", "name": "VIKASH KUMAR BHARTI", "mobile": "7022078644", "rera": "PRM/KA/RERA/1251/309/AG/251125/006514", "address": "T3-907, SATTVA EXOTIC, BAGALUR MAIN ROAD, DWARKA NAGAR, , CHIDANANDA REDDY LAYOUT, , BENGALURU URBAN , KARNATAKA-560063", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8D: Yelahanka, Kogilu & Bagalur Main Rd", "distKm": 22.8, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 1, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva City", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8D: Yelahanka, Kogilu & Bagalur Main Rd. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-147", "cpId": "1783", "name": "PRITHVI RAJ SHUKLA", "mobile": "8660585489", "rera": "PRM/KA/RERA/1251/310/AG/210218/002274", "address": "#228,7TH MAIN MARUTHICO-OPERATIVE SOCIETY VASANTHAPURA, NEAR SAI BABA TEMPLE DODAKALLASANDRA BANGALORE , BENGALURU URBAN , KARNATAKA-560062", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)", "cluster": "Cluster 3A: Konanakunte, Dodakallasandra & ISRO Layout", "distKm": 11.8, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 1, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 2, "projects": "Sattva Forest Ridge, Sattva Park Cubix Phase II", "persona": "Favorite", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Strong Walk-in generator (2 walk-ins in Sattva Forest Ridge, Sattva Park Cubix Phase II). Priority closure follow-up.", "scheduledToday": false}, {"id": "CP-148", "cpId": "1786", "name": "JYOTI SHROFF(Tirupati Associates)", "mobile": "9845028061", "rera": "PRM/KA/RERA/1251/446/AG/181115/001141", "address": "6/A, GEM WELLINGTON,OLD AIRPORT ROAD , BENGALURU URBAN , KARNATAKA-560017", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 6: East & Whitefield Corridor", "cluster": "Cluster 6A: Indiranagar, Domlur & Old Airport Rd", "distKm": 12.5, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 6A: Indiranagar, Domlur & Old Airport Rd. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-149", "cpId": "1789", "name": "C K VANITHA (C PROFIT)", "mobile": "9036165994", "rera": "PRM/KA/RERA/1251/310/AG/180727/001043", "address": "CPROFIT, 716, 17TH MAIN ROAD, 38TH CROSS, JAYANAGAR 4TH BLOCK, BENGALURU, KARNATAKA-560041", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 1: Near Home (West & South-West)", "cluster": "Cluster 1A: Mysore Rd, Banashankari & Jayanagar", "distKm": 5.8, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 1A: Mysore Rd, Banashankari & Jayanagar. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-150", "cpId": "1808", "name": "SIVARAMAN (One Square Meter Realty)", "mobile": "8870673194", "rera": "PRM/KA/RERA/1251/309/AG/220209/002796", "address": "Site No. 47, Naganathapura, 2nd Cross, Balaji Garden, Bangalore 560100", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 5: Hosur Rd & Electronic City", "cluster": "Cluster 5A: Naganathapura, Rayasandra & E-City", "distKm": 19.5, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 5A: Naganathapura, Rayasandra & E-City. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-151", "cpId": "1823", "name": "DEEPA BASAVARAJ GONDALAGI", "mobile": "9448733722", "rera": "PRM/KA/RERA/1251/310/AG/250820/006051", "address": "NO 151/B, 5TH CROSS, BALAJI LAYOUT, MALLATHAHALLI, BENGALURU, KARNATAKA-560056", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 1: Near Home (West & South-West)", "cluster": "Cluster 1B: Nagarbhavi, Mallathahalli & Ullal", "distKm": 9.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 1B: Nagarbhavi, Mallathahalli & Ullal. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-152", "cpId": "1826", "name": "SAYANTI MAJUMDAR (White Cloud Realty)", "mobile": "9686987757", "rera": "PRM/KA/RERA/1251/309/AG/260122/006759", "address": "NO 29 KRISHNA NORTHWOODS SAMPIGEHALLI ROAD OFF THANISANDRA MAIN ROAD NEAR VIBGYOR SCHOOL , THANISANDRA MAIN ROAD , BENGALURU URBAN ,", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8B: Thanisandra Main Rd & Bhartiya City Belt", "distKm": 18.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8B: Thanisandra Main Rd & Bhartiya City Belt. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-153", "cpId": "1831", "name": "MAHANTESH KOLI(MS Square Properties)", "mobile": "9513566650", "rera": "PRM/KA/RERA/1251/310/AG/210807/002472", "address": "93,9TH MAIN, 5TH C CROSS , VIJAYA BANK LATOUT, , BILEKAHALLI, BTM 4TH STAGE BANGALORE SOUTH , BENGALURU URBAN , KARNATAKA-560076", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)", "cluster": "Cluster 3C: Bilekahalli, Hulimavu & Gottigere", "distKm": 12.6, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 3C: Bilekahalli, Hulimavu & Gottigere. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-154", "cpId": "1834", "name": "MANJUNATH S", "mobile": "8867621449", "rera": "PRM/KA/RERA/1251/309/AG/260730/007588", "address": "#217 , CHOWDESHWARI TEMPLE STREET , DODDABALLAPUR , BENGALURU URBAN , KARNATAKA-561203", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)", "cluster": "Cluster 8E: Devanahalli & Doddaballapur (Near Vasanta Skye)", "distKm": 35.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 8E: Devanahalli & Doddaballapur (Near Vasanta Skye). Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-155", "cpId": "1843", "name": "Profuse Properties", "mobile": "9900502163", "rera": "PRM/RERA/1251/310/AG/200701/001921", "address": "28, 2nd Floor, Hosur Main Road Near Prashanth Hospital, Bommanahalli, Bengaluru, Karnataka 560068", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 4: South-East Core (HSR / Koramangala / BTM)", "cluster": "Cluster 4C: BTM 2nd Stage, Bommanahalli & Begur", "distKm": 11.2, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "OK-OK", "lastVisited": "2026-10-09 (Bommanahalli)", "scheduledDate": "", "meetingDone": true, "notes": "Visited on 2026-10-09 (Bommanahalli)", "scheduledToday": false}, {"id": "CP-156", "cpId": "1849", "name": "JOMET MATHEW", "mobile": "7619416465", "rera": "PRM/KA/RERA/1251/309/AG/250425/005705", "address": "305, JC SERENE APARTMENT, BWSSB ROAD, BELUR NAGASANDRA, CHALLAGHATTA, MARATHAHALLI , PO: DODDANEKKUNDI, DIST: BENGALURU , BENGALURU URBAN, KARNATAKA", "missingAddress": false, "createdBy": "Madhu Menon", "zone": "Zone 6: East & Whitefield Corridor", "cluster": "Cluster 6B: Marathahalli, Balagere & Varthur", "distKm": 19.8, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Topibaaz", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Mapped in Cluster 6B: Marathahalli, Balagere & Varthur. Club with 3-4 nearby CPs during zone beat.", "scheduledToday": false}, {"id": "CP-157", "cpId": "1941", "name": "Kenchappa H J", "mobile": "9686872201", "rera": "PRM/KA/RERA/1251/310/AG/221108/003228", "address": "-", "missingAddress": true, "createdBy": "Tejashwari Pujar", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Needs Address Collection", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 0, "projects": "", "persona": "Dead", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Address missing in master sheet. Call/WhatsApp to collect office location pin.", "scheduledToday": false}, {"id": "CP-158", "cpId": "WLK-158", "name": "T M SREERAMA MURTHY", "mobile": "", "rera": "Pending CRM Sync", "address": "-", "missingAddress": true, "createdBy": "Walk-in Report Sync", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Walk-in Generator (Add Address)", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 3, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 4, "projects": "Sattva Songbird Phase 2", "persona": "Favorite", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Active in Walk-in sheet; needs Mobile & Address from CRM", "scheduledToday": false}, {"id": "CP-159", "cpId": "WLK-159", "name": "RONGALI RAMJEE", "mobile": "", "rera": "Pending CRM Sync", "address": "-", "missingAddress": true, "createdBy": "Walk-in Report Sync", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Walk-in Generator (Add Address)", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 1, "bookings2026": 0, "revSepCr": 1.37, "sepWalkins": 2, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 3, "projects": "Sattva Lumina", "persona": "HNI", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Active in Walk-in sheet; needs Mobile & Address from CRM", "scheduledToday": false}, {"id": "CP-160", "cpId": "WLK-160", "name": "ONE BETTER SQUARES PRIVATE LIMITED", "mobile": "", "rera": "Pending CRM Sync", "address": "-", "missingAddress": true, "createdBy": "Walk-in Report Sync", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Walk-in Generator (Add Address)", "distKm": 0.0, "inActiveSheet": true, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 1, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Lumina", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Active in Walk-in sheet; needs Mobile & Address from CRM", "scheduledToday": false}, {"id": "CP-161", "cpId": "WLK-161", "name": "ASHISH RAJAK", "mobile": "", "rera": "Pending CRM Sync", "address": "-", "missingAddress": true, "createdBy": "Walk-in Report Sync", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Walk-in Generator (Add Address)", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Ekatra", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Active in Walk-in sheet; needs Mobile & Address from CRM", "scheduledToday": false}, {"id": "CP-162", "cpId": "WLK-162", "name": "JITENDRA KUMAR GUPTA", "mobile": "", "rera": "Pending CRM Sync", "address": "-", "missingAddress": true, "createdBy": "Walk-in Report Sync", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Walk-in Generator (Add Address)", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 1, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 1, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva City", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Active in Walk-in sheet; needs Mobile & Address from CRM", "scheduledToday": false}, {"id": "CP-163", "cpId": "WLK-163", "name": "SANTOSH KUMAR SINGH", "mobile": "", "rera": "Pending CRM Sync", "address": "-", "missingAddress": true, "createdBy": "Walk-in Report Sync", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Walk-in Generator (Add Address)", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 1, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 0, "octWalkins": 1, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Songbird Rowhouse", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Active in Walk-in sheet; needs Mobile & Address from CRM", "scheduledToday": false}, {"id": "CP-164", "cpId": "WLK-164", "name": "SUDHEESH SK", "mobile": "", "rera": "Pending CRM Sync", "address": "-", "missingAddress": true, "createdBy": "Walk-in Report Sync", "zone": "Zone 0: Missing Address (Tele-Queue)", "cluster": "Unmapped - Walk-in Generator (Add Address)", "distKm": 0.0, "inActiveSheet": false, "bookings2025": 0, "bookings2026": 0, "revSepCr": 0.0, "sepWalkins": 1, "octWalkins": 0, "novWalkins": 0, "totalWalkins": 1, "projects": "Sattva Bliss", "persona": "OK-OK", "lastVisited": "", "scheduledDate": "", "meetingDone": false, "notes": "Active in Walk-in sheet; needs Mobile & Address from CRM", "scheduledToday": false}];
+    const DEFAULT_CONVEYANCE = [{"id": "TR-01", "date": "2026-10-03", "from": "Mallikarjuna Meadows, KG Nagar", "to": "Sattva Vasanta Skye (Devanahalli) -> Home", "purpose": "Site Visit & CP Sourcing - Sattva Vasanta Skye", "kms": 73.2, "category": "Site Visit"}, {"id": "TR-02", "date": "2026-10-04", "from": "Mallikarjuna Meadows, KG Nagar", "to": "Sattva Forest Ridge (JP Nagar 9th Phase) -> Home", "purpose": "Weekend Site Duty & Client Visit - Sattva Forest Ridge", "kms": 28.1, "category": "Site Visit"}, {"id": "TR-03", "date": "2026-10-06", "from": "Mallikarjuna Meadows, KG Nagar", "to": "Sattva Vasanta Skye (Devanahalli) -> Home", "purpose": "Site Office Visit & Inventory Check - Sattva Vasanta Skye", "kms": 73.2, "category": "Site Visit"}, {"id": "TR-04", "date": "2026-10-07", "from": "Mallikarjuna Meadows, KG Nagar", "to": "The Fore (Kodathi) -> Aspyra Realty (HSR) -> One Meter Square (HSR) -> Home", "purpose": "Outbound CP Meetings (NoBroker, Aspyra, One Meter Square)", "kms": 45.3, "category": "DAR Outbound"}, {"id": "TR-05", "date": "2026-10-08", "from": "Mallikarjuna Meadows, KG Nagar", "to": "Premier Consulting (HSR) -> Real Capital (HSR) -> Encore Entrust (Off MG Rd) -> Home", "purpose": "Outbound CP Meetings (Premier, Real Capital, Encore Entrust)", "kms": 40.5, "category": "DAR Outbound"}, {"id": "TR-06", "date": "2026-10-09", "from": "Mallikarjuna Meadows, KG Nagar", "to": "Next Foot Step (HSR Layout) -> Profuse Properties (Bommanahalli) -> Home", "purpose": "Outbound CP Meetings (Next Foot Step, Profuse Properties)", "kms": 28.9, "category": "DAR Outbound"}, {"id": "TR-07", "date": "2026-10-10", "from": "Mallikarjuna Meadows, KG Nagar", "to": "Sattva Vasanta Skye (Devanahalli) -> Home", "purpose": "Weekend Site Duty & CP Walkthrough - Sattva Vasanta Skye", "kms": 73.2, "category": "Site Visit"}, {"id": "TR-08", "date": "2026-10-11", "from": "Mallikarjuna Meadows, KG Nagar", "to": "Sattva Forest Ridge (JP Nagar 9th Phase) -> Home", "purpose": "Weekend Site Duty & Client Visit - Sattva Forest Ridge", "kms": 28.1, "category": "Site Visit"}, {"id": "TR-09", "date": "2026-10-13", "from": "Mallikarjuna Meadows, KG Nagar", "to": "Ample Profin (Frazer Town) -> 27 Estates (Infantry Rd) -> BTM Layout -> Home", "purpose": "Outbound CP Meetings (Ample Profin, 27 Estates, Jagannath Venkat)", "kms": 34.3, "category": "DAR Outbound"}, {"id": "TR-10", "date": "2026-10-14", "from": "Mallikarjuna Meadows, KG Nagar", "to": "Senient Ventures (Jigani) -> Sattva Forest Ridge (JP Nagar 9th Phase) -> Home", "purpose": "Outbound CP Meeting & Site Visit (Senient Ventures, Veeresh Asundi)", "kms": 69.6, "category": "DAR + Site"}, {"id": "TR-11", "date": "2026-10-16", "from": "Mallikarjuna Meadows, KG Nagar", "to": "Sattva Forest Ridge (JP Nagar 9th Phase) -> Home", "purpose": "Site Office Visit & CP Alignment - Sattva Forest Ridge", "kms": 28.1, "category": "Site Visit"}, {"id": "TR-12", "date": "2026-10-17", "from": "Mallikarjuna Meadows, KG Nagar", "to": "Sattva Vasanta Skye (Devanahalli) -> Home", "purpose": "Weekend Site Duty & CP Drive - Sattva Vasanta Skye", "kms": 73.2, "category": "Site Visit"}, {"id": "TR-13", "date": "2026-10-18", "from": "Mallikarjuna Meadows, KG Nagar", "to": "Sattva Forest Ridge (JP Nagar 9th Phase) -> Home", "purpose": "Weekend Site Duty & Closing Follow-up - Sattva Forest Ridge", "kms": 28.1, "category": "Site Visit"}, {"id": "TR-14", "date": "2026-10-21", "from": "Mallikarjuna Meadows, KG Nagar", "to": "Sattva Vasanta Skye (Devanahalli) -> Home", "purpose": "Site Office Visit & Marketing Alignment - Sattva Vasanta Skye", "kms": 73.2, "category": "Site Visit"}, {"id": "TR-15", "date": "2026-10-22", "from": "Mallikarjuna Meadows, KG Nagar", "to": "JLL (Infantry Road) -> 27 Estates (MG Road) -> Home", "purpose": "Outbound CP Meetings (JLL, 27 Estates)", "kms": 16.3, "category": "DAR Outbound"}, {"id": "TR-16", "date": "2026-10-24", "from": "Mallikarjuna Meadows, KG Nagar", "to": "Sattva Vasanta Skye (Devanahalli) -> Home", "purpose": "Weekend Site Duty & Client Walkthrough - Sattva Vasanta Skye", "kms": 73.2, "category": "Site Visit"}, {"id": "TR-17", "date": "2026-10-25", "from": "Mallikarjuna Meadows, KG Nagar", "to": "Sattva Forest Ridge (JP Nagar 9th Phase) -> Home", "purpose": "Weekend Site Duty & CP Tagging - Sattva Forest Ridge", "kms": 28.1, "category": "Site Visit"}];
+
+    const PERSONAS = ['Favorite', 'HNI', 'OK-OK', 'Topibaaz', 'Dead'];
+    const PERSONA_CONFIG = {
+      'Favorite': { label: 'Favorite ⭐', short: 'Favorite', cls: 'persona-fav', sub: 'Consistent Walk-in Star', weight: 55 },
+      'HNI':      { label: 'HNI / Closer 💎', short: 'HNI', cls: 'persona-hni', sub: 'High-Ticket / Past Closer', weight: 48 },
+      'OK-OK':    { label: 'OK-OK 👍', short: 'OK-OK', cls: 'persona-ok', sub: 'Warm / Needs Push', weight: 25 },
+      'Topibaaz': { label: 'Topibaaz 🎭', short: 'Topibaaz', cls: 'persona-topi', sub: 'Fake Promises / Strict 5-Min Call', weight: 10 },
+      'Dead':     { label: 'Dead 💀', short: 'Dead', cls: 'persona-dead', sub: 'Dormant / Broadcast Only', weight: 0 }
+    };
+
+    let cps = [];
+    let conveyance = [];
+    let activePersonaFilter = 'ALL';
+
+    function loadData() {
+      try {
+        const sCps = localStorage.getItem('nitesh_command_cps_v2');
+        const sConv = localStorage.getItem('nitesh_command_conv_v2');
+        cps = sCps ? JSON.parse(sCps) : JSON.parse(JSON.stringify(DEFAULT_CPS));
+        conveyance = sConv ? JSON.parse(sConv) : JSON.parse(JSON.stringify(DEFAULT_CONVEYANCE));
+        // If an older cached version had fewer than 160 CPs, auto-upgrade to all 164 CPs!
+        if (!cps || cps.length < 160) {
+          cps = JSON.parse(JSON.stringify(DEFAULT_CPS));
+        }
+      } catch (e) {
+        cps = JSON.parse(JSON.stringify(DEFAULT_CPS));
+        conveyance = JSON.parse(JSON.stringify(DEFAULT_CONVEYANCE));
+      }
+    }
+
+    function saveData() {
+      try {
+        localStorage.setItem('nitesh_command_cps_v2', JSON.stringify(cps));
+        localStorage.setItem('nitesh_command_conv_v2', JSON.stringify(conveyance));
+      } catch (e) {}
+      renderAll();
+    }
+
+    function computePriority(cp) {
+      const pW = (PERSONA_CONFIG[cp.persona] || PERSONA_CONFIG['OK-OK']).weight;
+      const wScore = (Number(cp.totalWalkins) || 0) * 18 + (Number(cp.novWalkins) || 0) * 12;
+      const b25Score = (Number(cp.bookings2025) || 0) * 10;
+      const b26Score = (Number(cp.bookings2026) || 0) * 50;
+      const revScore = (Number(cp.revSepCr) || 0) * 25;
+      return Math.round(pW + wScore + b25Score + b26Score + revScore);
+    }
+
+    function switchTab(tabNum) {
+      [1, 2, 3, 4].forEach(n => {
+        document.getElementById('view-tab-' + n).classList.add('hidden');
+        const btn = document.getElementById('nav-tab-' + n);
+        btn.className = 'px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800 transition';
+      });
+      document.getElementById('view-tab-' + tabNum).classList.remove('hidden');
+      document.getElementById('nav-tab-' + tabNum).className = 'px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap bg-indigo-600 text-white shadow-md transition';
+    }
+
+    function setPersona(cpId, newPersona) {
+      const cp = cps.find(c => c.id === cpId);
+      if (!cp) return;
+      cp.persona = newPersona;
+      saveData();
+    }
+
+    function setPersonaFilter(p) {
+      activePersonaFilter = (activePersonaFilter === p) ? 'ALL' : p;
+      renderAll();
+    }
+
+    function jumpToZoneCaller(zoneName) {
+      switchTab(2);
+      const zSel = document.getElementById('caller-zone-select');
+      zSel.value = zoneName;
+      onCallerZoneChange();
+    }
+
+    function toggleFixMeet(cpId) {
+      const cp = cps.find(c => c.id === cpId);
+      if (!cp) return;
+      cp.scheduledToday = !cp.scheduledToday;
+      saveData();
+    }
+
+    function markMeetingDoneQuick(cpId) {
+      const cp = cps.find(c => c.id === cpId);
+      if (!cp) return;
+      const note = prompt(`Meeting Done with ${cp.name}!\nAdd discussion notes / promises made:`, cp.notes || 'Met at office, pitched Vasanta Skye & Forest Ridge.');
+      if (note === null) return;
+      const stamp = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+      cp.meetingDone = true;
+      cp.scheduledToday = false;
+      cp.lastVisited = stamp;
+      cp.notes = note.trim() || cp.notes;
+
+      if (cp.distKm > 0) {
+        conveyance.unshift({
+          id: 'TR-' + Date.now(),
+          date: new Date().toISOString().slice(0, 10),
+          from: 'Mallikarjuna Meadows, KG Nagar',
+          to: `${cp.name} (${cp.cluster.split(':')[0]}) -> Home`,
+          purpose: `Outbound CP Meeting - ${cp.name}`,
+          kms: Number((cp.distKm * 2).toFixed(1)),
+          category: 'CP Meeting'
+        });
+      }
+      saveData();
+    }
+
+    function renderTab1() {
+      const total = cps.length;
+      const activeCPs = cps.filter(c => (Number(c.totalWalkins) || 0) > 0 || (Number(c.bookings2026) || 0) > 0).length;
+      const pct = ((activeCPs / total) * 100).toFixed(1);
+      const totWalkins = cps.reduce((s, c) => s + (Number(c.totalWalkins) || 0), 0);
+      const totB25 = cps.reduce((s, c) => s + (Number(c.bookings2025) || 0), 0);
+      const totB26 = cps.reduce((s, c) => s + (Number(c.bookings2026) || 0), 0);
+      const missingCnt = cps.filter(c => c.missingAddress).length;
+      const totKms = conveyance.reduce((s, r) => s + (Number(r.kms) || 0), 0);
+      const schedList = cps.filter(c => c.scheduledToday);
+
+      document.getElementById('nav-cp-count').textContent = total;
+      document.getElementById('nav-sched-count').textContent = schedList.length;
+      document.getElementById('nav-missing-count').textContent = missingCnt;
+      document.getElementById('missing-header-count').textContent = missingCnt;
+
+      document.getElementById('kpi-walkins').textContent = totWalkins;
+      document.getElementById('kpi-active-text').textContent = `Current Active Walk-in CPs: ${activeCPs} of ${total} CPs (${pct}%)`;
+      document.getElementById('kpi-b25').textContent = totB25;
+      document.getElementById('kpi-b26').textContent = totB26;
+      document.getElementById('kpi-missing').textContent = missingCnt;
+      document.getElementById('kpi-kms').textContent = totKms.toFixed(1);
+
+      // Persona Grid
+      document.getElementById('persona-cards-grid').innerHTML = PERSONAS.map(p => {
+        const cfg = PERSONA_CONFIG[p];
+        const cnt = cps.filter(c => c.persona === p).length;
+        const activeRing = activePersonaFilter === p ? 'ring-2 ring-white' : '';
+        return `
+          <div onclick="setPersonaFilter('${p}')" class="p-3 rounded-xl cursor-pointer transition ${cfg.cls} ${activeRing}">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold">${cfg.label}</span>
+              <span class="text-lg font-black">${cnt}</span>
+            </div>
+            <div class="text-[10px] opacity-80 mt-0.5">${cfg.sub}</div>
+          </div>
+        `;
+      }).join('');
+
+      // Card 2 Zone Quick List
+      const zones = [...new Set(cps.filter(c => !c.missingAddress).map(c => c.zone))].sort();
+      document.getElementById('zone-quick-list').innerHTML = zones.map(z => {
+        const zCPs = cps.filter(c => c.zone === z);
+        return `
+          <div onclick="jumpToZoneCaller('${z}')" class="sub-card p-3 flex items-center justify-between cursor-pointer hover:border-indigo-500/60 transition">
+            <div>
+              <div class="text-xs font-extrabold text-white">${z}</div>
+              <div class="text-[11px] text-slate-400">${zCPs.length} CPs mapped</div>
+            </div>
+            <span class="text-slate-400 font-bold">&rsaquo;</span>
+          </div>
+        `;
+      }).join('');
+
+      // Card 2 Confirmed Lineup
+      document.getElementById('card2-sched-count').textContent = schedList.length;
+      const estLoopKm = schedList.reduce((s, c) => s + (Number(c.distKm) || 6), 6).toFixed(1);
+      document.getElementById('card2-est-loop').textContent = `Est. Loop: ~${estLoopKm} km`;
+
+      document.getElementById('card2-lineup-list').innerHTML = schedList.length === 0
+        ? `<div class="text-xs text-slate-500 py-2">No CPs locked yet. Click "Fix Meet" on any CP card!</div>`
+        : schedList.map((cp, idx) => `
+          <div class="p-2.5 rounded-lg bg-slate-900/95 border border-slate-800 flex items-center justify-between gap-2">
+            <div class="text-xs font-bold text-white truncate">
+              <span class="text-amber-400">#${idx + 1}</span> ${cp.name}
+              <span class="text-[11px] text-slate-400 font-normal">(${cp.cluster.split(':')[0]})</span>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              ${cp.mobile ? `<a href="tel:${cp.mobile}" class="px-2 py-1 rounded bg-slate-800 text-emerald-400 text-xs">📞</a>` : ''}
+              <button onclick="markMeetingDoneQuick('${cp.id}')" class="px-2.5 py-1 rounded bg-emerald-600/30 hover:bg-emerald-600 border border-emerald-500/40 text-emerald-200 hover:text-white text-xs font-extrabold">
+                Done ✅
+              </button>
+            </div>
+          </div>
+        `).join('');
+
+      renderPriorityRadar();
+    }
+
+    function renderPriorityRadar() {
+      const q = (document.getElementById('radar-search').value || '').toLowerCase().trim();
+      let list = cps.filter(c => {
+        if (activePersonaFilter !== 'ALL' && c.persona !== activePersonaFilter) return false;
+        if (!q) return true;
+        return c.name.toLowerCase().includes(q) || (c.mobile || '').toLowerCase().includes(q) || (c.address || '').toLowerCase().includes(q) || (c.cluster || '').toLowerCase().includes(q);
+      });
+      list.sort((a, b) => computePriority(b) - computePriority(a));
+
+      document.getElementById('priority-radar-list').innerHTML = list.slice(0, 50).map((cp, i) => {
+        const score = computePriority(cp);
+        const cfg = PERSONA_CONFIG[cp.persona] || PERSONA_CONFIG['OK-OK'];
+        return `
+          <div class="sub-card p-3.5 flex flex-col justify-between gap-2.5 hover:border-slate-600 transition">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-full bg-indigo-950 border border-indigo-500/40 text-indigo-300 text-[11px] font-black flex items-center justify-center">${i + 1}</span>
+                  <span class="text-sm font-extrabold text-white">${cp.name}</span>
+                </div>
+                <div class="text-[11px] text-slate-400 mt-0.5">${cp.cluster} • ID: ${cp.cpId}</div>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-extrabold shrink-0">
+                Score: ${score}
+              </span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-1.5 text-[11px]">
+              <span class="px-2 py-0.5 rounded font-bold ${cfg.cls}">${cfg.label}</span>
+              <span class="px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 font-bold">2026 Walk-ins: ${cp.totalWalkins}</span>
+              ${cp.bookings2025 > 0 ? `<span class="px-2 py-0.5 rounded bg-indigo-950/80 border border-indigo-500/30 text-indigo-300 font-bold">2025 Deals: ${cp.bookings2025}</span>` : ''}
+            </div>
+
+            <div class="text-[11px] text-slate-300 bg-slate-950/70 p-2 rounded border border-slate-800/80">
+              📍 ${cp.address}
+              ${cp.lastVisited ? `<div class="text-emerald-400 font-semibold mt-1">✅ Last Met: ${cp.lastVisited} — ${cp.notes}</div>` : `<div class="text-slate-400 mt-0.5">💬 ${cp.notes}</div>`}
+            </div>
+
+            <div class="flex items-center justify-between gap-2 pt-1">
+              ${cp.mobile ? `<a href="tel:${cp.mobile}" class="flex-1 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-center text-slate-200 text-xs font-bold">📞 Call</a>` : `<span class="flex-1 py-1.5 text-center text-slate-600 text-xs">No Phone</span>`}
+              ${cp.mobile ? `<a href="https://wa.me/91${cp.mobile.replace(/\D/g,'')}?text=${encodeURIComponent('Hi ' + cp.name + ', Nitesh from Sattva Group!')}" target="_blank" class="flex-1 py-1.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/30 text-center text-emerald-300 text-xs font-bold">💬 WhatsApp</a>` : ''}
+              <button onclick="toggleFixMeet('${cp.id}')" class="flex-1 py-1.5 rounded-lg ${cp.scheduledToday ? 'bg-amber-500 text-slate-950' : 'bg-indigo-600 hover:bg-indigo-500 text-white'} text-xs font-extrabold">
+                ${cp.scheduledToday ? '📅 Fixed Today' : '📅 Fix Meet'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ==================== TAB 2: CALLER FUNCTIONS ====================
+    function initCallerFilters() {
+      const zones = [...new Set(cps.map(c => c.zone))].sort();
+      const zSel = document.getElementById('caller-zone-select');
+      const curZ = zSel.value || 'ALL';
+      zSel.innerHTML = `<option value="ALL">All Geographical Zones (${cps.length} CPs)</option>` + zones.map(z => {
+        const cnt = cps.filter(c => c.zone === z).length;
+        return `<option value="${z}">${z} (${cnt} CPs)</option>`;
+      }).join('');
+      zSel.value = zones.includes(curZ) ? curZ : 'ALL';
+      onCallerZoneChange();
+    }
+
+    function onCallerZoneChange() {
+      const z = document.getElementById('caller-zone-select').value;
+      const sub = z === 'ALL' ? cps : cps.filter(c => c.zone === z);
+      const clusters = [...new Set(sub.map(c => c.cluster))].sort();
+      const cSel = document.getElementById('caller-cluster-select');
+      cSel.innerHTML = `<option value="ALL">All Micro-Clusters in Zone (${sub.length} CPs)</option>` + clusters.map(cl => {
+        const cnt = sub.filter(c => c.cluster === cl).length;
+        return `<option value="${cl}">${cl} (${cnt} CPs)</option>`;
+      }).join('');
+      renderCallerCards();
+    }
+
+    function renderCallerCards() {
+      const z = document.getElementById('caller-zone-select').value;
+      const cl = document.getElementById('caller-cluster-select').value;
+      const pSel = document.getElementById('caller-persona-select');
+      const curP = pSel.value || 'ALL';
+      const q = (document.getElementById('caller-search').value || '').toLowerCase().trim();
+
+      let baseList = cps.filter(c => {
+        if (z !== 'ALL' && c.zone !== z) return false;
+        if (cl !== 'ALL' && c.cluster !== cl) return false;
+        if (!q) return true;
+        return c.name.toLowerCase().includes(q) || (c.mobile || '').toLowerCase().includes(q) || (c.address || '').toLowerCase().includes(q) || (c.projects || '').toLowerCase().includes(q);
+      });
+
+      pSel.innerHTML = `<option value="ALL">All Persona Types (${baseList.length} shown)</option>` + PERSONAS.map(p => {
+        const cnt = baseList.filter(c => c.persona === p).length;
+        return `<option value="${p}">${PERSONA_CONFIG[p].label} (${cnt})</option>`;
+      }).join('');
+      pSel.value = PERSONAS.includes(curP) ? curP : 'ALL';
+
+      if (pSel.value !== 'ALL') {
+        baseList = baseList.filter(c => c.persona === pSel.value);
+      }
+
+      baseList.sort((a, b) => computePriority(b) - computePriority(a));
+
+      document.getElementById('caller-cards-container').innerHTML = baseList.map((cp, idx) => {
+        const score = computePriority(cp);
+        return `
+          <div class="card-dark p-4 space-y-3 border border-slate-800 hover:border-indigo-500/50 transition">
+            <!-- Top Cluster Pill & Distance -->
+            <div class="flex items-center justify-between">
+              <span class="px-2.5 py-0.5 rounded-md bg-indigo-950/90 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold truncate max-w-[75%]">
+                ${cp.cluster}
+              </span>
+              <span class="text-[11px] text-slate-400 font-semibold">
+                ${cp.distKm > 0 ? '~' + cp.distKm + ' km' : 'Tele-Queue'}
+              </span>
+            </div>
+
+            <!-- Name & Priority Badge -->
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <h3 class="text-base font-extrabold text-white">#${idx + 1} ${cp.name}</h3>
+                <div class="text-xs text-slate-400">ID: ${cp.cpId} ${cp.mobile ? '• 📞 ' + cp.mobile : ''}</div>
+              </div>
+              <span class="px-2.5 py-1 rounded-md bg-amber-950/90 border border-amber-500/40 text-amber-300 text-xs font-extrabold shrink-0">
+                Priority: ${score}
+              </span>
+            </div>
+
+            <!-- 5 Persona Selector Pills (Exactly like Screenshot!) -->
+            <div class="flex flex-wrap gap-1.5">
+              ${PERSONAS.map(p => {
+                const active = cp.persona === p;
+                const activeCls = active
+                  ? 'bg-amber-500 text-slate-950 font-extrabold border-amber-400 shadow'
+                  : 'bg-slate-900/90 text-slate-400 border-slate-700 hover:text-white';
+                return `<button onclick="setPersona('${cp.id}', '${p}')" class="px-2.5 py-1 rounded-md text-[11px] border transition ${activeCls}">${p}</button>`;
+              }).join('')}
+            </div>
+
+            <!-- Address & Note Box -->
+            <div class="p-3 rounded-xl bg-slate-950/90 border border-slate-800/90 space-y-1 text-xs">
+              <div class="text-slate-200 font-medium">📍 ${cp.address}</div>
+              <div class="text-[11px] text-slate-400">💬 ${cp.notes}</div>
+              ${cp.lastVisited ? `<div class="text-[11px] text-emerald-400 font-bold">✅ Visited: ${cp.lastVisited}</div>` : ''}
+            </div>
+
+            <!-- Walk-ins & Bookings Pills -->
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2.5 py-1 rounded-md bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 text-[11px] font-extrabold">
+                2026 Walk-ins: ${cp.totalWalkins}
+              </span>
+              ${cp.bookings2025 > 0 ? `<span class="px-2.5 py-1 rounded-md bg-indigo-950/80 border border-indigo-500/30 text-indigo-300 text-[11px] font-extrabold">2025 Bookings: ${cp.bookings2025}</span>` : ''}
+              ${cp.projects ? `<span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-700 text-sky-300 text-[11px] font-semibold truncate max-w-[220px]">${cp.projects}</span>` : ''}
+            </div>
+
+            <!-- Bottom 3 Action Buttons: Call | WhatsApp | Fix Meet -->
+            <div class="grid grid-cols-3 gap-2 pt-1">
+              ${cp.mobile
+                ? `<a href="tel:${cp.mobile}" class="py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-center text-slate-200 text-xs font-extrabold flex items-center justify-center gap-1">📞 Call</a>`
+                : `<span class="py-2 rounded-xl bg-slate-900/50 border border-slate-800 text-center text-slate-600 text-xs font-bold">No Phone</span>`
+              }
+              ${cp.mobile
+                ? `<a href="https://wa.me/91${cp.mobile.replace(/\D/g,'')}?text=${encodeURIComponent('Hi ' + cp.name + ', Nitesh here from Sattva Group. I am visiting ' + cp.cluster.split(':')[0] + ' this week—let us meet for 10 mins!')}" target="_blank" class="py-2 rounded-xl bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-500/40 text-center text-emerald-300 text-xs font-extrabold flex items-center justify-center gap-1">💬 WhatsApp</a>`
+                : `<span class="py-2 rounded-xl bg-slate-900/50 border border-slate-800 text-center text-slate-600 text-xs font-bold">No WA</span>`
+              }
+              <button onclick="toggleFixMeet('${cp.id}')" class="py-2 rounded-xl ${cp.scheduledToday ? 'bg-amber-500 text-slate-950' : 'bg-indigo-600 hover:bg-indigo-500 text-white'} text-xs font-extrabold flex items-center justify-center gap-1 shadow-md">
+                ${cp.scheduledToday ? '📅 Fixed!' : '📅 Fix Meet'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ==================== TAB 3: LOGGER & CONVEYANCE ====================
+    function renderTab3() {
+      const sorted = [...cps].sort((a, b) => a.name.localeCompare(b.name));
+      const lSel = document.getElementById('logger-cp-dropdown');
+      const curVal = lSel.value;
+      lSel.innerHTML = sorted.map(c => `<option value="${c.id}">${c.name} (${c.cluster.split(':')[0]})</option>`).join('');
+      if (curVal) lSel.value = curVal;
+
+      const doneCPs = cps.filter(c => c.lastVisited);
+      document.getElementById('completed-meetings-list').innerHTML = doneCPs.map(c => `
+        <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-xs space-y-1">
+          <div class="flex justify-between font-bold text-white">
+            <span>${c.name}</span>
+            <span class="text-[10px] text-emerald-400">${c.lastVisited}</span>
+          </div>
+          <div class="text-[11px] text-slate-400">${c.notes}</div>
+        </div>
+      `).join('');
+
+      const totKm = conveyance.reduce((s, r) => s + (Number(r.kms) || 0), 0);
+      document.getElementById('conv-sum-km').textContent = totKm.toFixed(1) + ' km';
+      document.getElementById('conv-sum-2w').textContent = '₹' + (totKm * 5.5).toFixed(2);
+      document.getElementById('conv-sum-4w').textContent = '₹' + (totKm * 9.0).toFixed(2);
+
+      document.getElementById('conv-rows-body').innerHTML = conveyance.map(r => {
+        const km = Number(r.kms) || 0;
+        return `
+          <tr class="hover:bg-slate-900/60">
+            <td class="p-2.5 font-bold text-white whitespace-nowrap">${r.date}</td>
+            <td class="p-2.5 text-slate-200">${r.to}</td>
+            <td class="p-2.5 text-slate-400">${r.purpose}</td>
+            <td class="p-2.5 text-right font-extrabold text-white">${km.toFixed(1)}</td>
+            <td class="p-2.5 text-right font-bold text-emerald-400">₹${(km * 5.5).toFixed(2)}</td>
+            <td class="p-2.5 text-right font-bold text-amber-400">₹${(km * 9.0).toFixed(2)}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function submitMeetingLogger() {
+      const cpId = document.getElementById('logger-cp-dropdown').value;
+      const cp = cps.find(c => c.id === cpId);
+      if (!cp) return;
+      const mom = document.getElementById('logger-mom-input').value.trim();
+      const stamp = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+      cp.meetingDone = true;
+      cp.scheduledToday = false;
+      cp.lastVisited = stamp;
+      if (mom) cp.notes = mom;
+
+      const rtKm = cp.distKm > 0 ? Number((cp.distKm * 2).toFixed(1)) : 22.0;
+      conveyance.unshift({
+        id: 'TR-' + Date.now(),
+        date: new Date().toISOString().slice(0, 10),
+        from: 'Mallikarjuna Meadows, KG Nagar',
+        to: `${cp.name} (${cp.cluster.split(':')[0]}) -> Home`,
+        purpose: `Outbound CP Meeting - ${cp.name}`,
+        kms: rtKm,
+        category: 'CP Meeting'
+      });
+      document.getElementById('logger-mom-input').value = '';
+      saveData();
+      alert(`Meeting logged & timestamped (${stamp}) for ${cp.name}!`);
+    }
+
+    function addSiteVisitTrip(siteName, kms) {
+      conveyance.unshift({
+        id: 'TR-' + Date.now(),
+        date: new Date().toISOString().slice(0, 10),
+        from: 'Mallikarjuna Meadows, KG Nagar',
+        to: `${siteName} -> Home (KG Nagar)`,
+        purpose: `Site Office Visit & CP Alignment - ${siteName}`,
+        kms: kms,
+        category: 'Site Visit'
+      });
+      saveData();
+      alert(`Added ${siteName} (${kms} km RT) to Conveyance Ledger!`);
+    }
+
+    // ==================== TAB 4: MISSING ADDRESS QUEUE ====================
+    function renderTab4() {
+      const missingList = cps.filter(c => c.missingAddress);
+      document.getElementById('missing-cards-grid').innerHTML = missingList.map(cp => `
+        <div class="sub-card p-4 space-y-2.5">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="text-sm font-extrabold text-white">${cp.name}</div>
+              <div class="text-xs text-slate-400">ID: ${cp.cpId} • ${cp.mobile || 'Mobile Missing'}</div>
+            </div>
+            <div class="flex gap-1.5">
+              ${cp.mobile ? `<a href="tel:${cp.mobile}" class="px-2.5 py-1 rounded bg-slate-800 text-sky-300 text-xs font-bold">📞 Call</a>` : ''}
+              ${cp.mobile ? `<a href="https://wa.me/91${cp.mobile.replace(/\D/g,'')}?text=${encodeURIComponent('Hi ' + cp.name + ', Nitesh from Sattva Group. Please share your office address/pin so I can drop by with our project kits!')}" target="_blank" class="px-2.5 py-1 rounded bg-emerald-950 border border-emerald-500/40 text-emerald-300 text-xs font-bold">💬 Ask Pin</a>` : ''}
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <input type="text" id="miss-inp-${cp.id}" placeholder="Enter Office Address & Area (e.g. HSR Layout, Yelahanka)..." class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white" />
+            <button onclick="saveMissingAddr('${cp.id}')" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold">
+              Save &amp; Map
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function mapAreaToZone(addr) {
+      const u = addr.toUpperCase();
+      if (u.includes('MYSORE') || u.includes('JAYANAGAR') || u.includes('BANASHANKARI') || u.includes('NAGARBHAVI'))
+        return ['Zone 1: Near Home (West & South-West)', 'Cluster 1A: Mysore Rd, Banashankari & Jayanagar', 6.0];
+      if (u.includes('INFANTRY') || u.includes('MG ROAD') || u.includes('MALLESHWARAM') || u.includes('YESHWANTHPUR') || u.includes('ULSOOR'))
+        return ['Zone 2: Central CBD & Infantry Rd', 'Cluster 2A: Infantry Rd & MG Rd Loop', 7.5];
+      if (u.includes('JP NAGAR') || u.includes('KONANAKUNTE') || u.includes('BANNERGHATTA') || u.includes('MADIWALA'))
+        return ['Zone 3: South (JP Nagar / Bannerghatta - Forest Ridge)', 'Cluster 3A: Konanakunte, Dodakallasandra & ISRO Layout', 11.5];
+      if (u.includes('HSR') || u.includes('KORAMANGALA') || u.includes('BTM') || u.includes('BOMMANAHALLI'))
+        return ['Zone 4: South-East Core (HSR / Koramangala / BTM)', 'Cluster 4A: HSR Layout & Iblur Hub', 13.0];
+      if (u.includes('INDIRANAGAR') || u.includes('WHITEFIELD') || u.includes('MARATHAHALLI') || u.includes('VARTHUR'))
+        return ['Zone 6: East & Whitefield Corridor', 'Cluster 6A: Indiranagar, Domlur & Old Airport Rd', 15.0];
+      if (u.includes('HEBBAL') || u.includes('RT NAGAR') || u.includes('VIDYARANYAPURA') || u.includes('SAHAKARNAGAR'))
+        return ['Zone 7: North-Central (Hebbal / RT Nagar / Vidyaranyapura)', 'Cluster 7B: RT Nagar, Ganganagar & Hebbal Kempapura', 13.0];
+      if (u.includes('YELAHANKA') || u.includes('THANISANDRA') || u.includes('DEVANAHALLI') || u.includes('HORAMAVU'))
+        return ['Zone 8: North Airport Belt (Thanisandra / Yelahanka / Devanahalli)', 'Cluster 8D: Yelahanka, Kogilu & Bagalur Main Rd', 22.0];
+      return ['Zone 2: Central CBD & Infantry Rd', 'Cluster 2A: Infantry Rd & MG Rd Loop', 9.0];
+    }
+
+    function saveMissingAddr(cpId) {
+      const inp = document.getElementById('miss-inp-' + cpId);
+      if (!inp || !inp.value.trim()) return;
+      const cp = cps.find(c => c.id === cpId);
+      if (!cp) return;
+      const addr = inp.value.trim();
+      const [z, cl, d] = mapAreaToZone(addr);
+      cp.address = addr;
+      cp.missingAddress = false;
+      cp.zone = z;
+      cp.cluster = cl;
+      cp.distKm = d;
+      initCallerFilters();
+      saveData();
+    }
+
+    // ==================== MODALS & EXPORTS ====================
+    function openWeeklyLeadModal() {
+      const sorted = [...cps].sort((a, b) => a.name.localeCompare(b.name));
+      const mSel = document.getElementById('modal-cp-select');
+      mSel.innerHTML = sorted.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      loadModalCPStats();
+      document.getElementById('modal-weekly').classList.remove('hidden');
+    }
+
+    function closeWeeklyLeadModal() {
+      document.getElementById('modal-weekly').classList.add('hidden');
+    }
+
+    function loadModalCPStats() {
+      const cpId = document.getElementById('modal-cp-select').value;
+      const cp = cps.find(c => c.id === cpId);
+      if (!cp) return;
+      document.getElementById('modal-sep-w').value = cp.sepWalkins || 0;
+      document.getElementById('modal-oct-w').value = cp.octWalkins || 0;
+      document.getElementById('modal-nov-w').value = cp.novWalkins || 0;
+      document.getElementById('modal-b25').value = cp.bookings2025 || 0;
+      document.getElementById('modal-b26').value = cp.bookings2026 || 0;
+      document.getElementById('modal-projects').value = cp.projects || '';
+    }
+
+    function saveModalCPStats() {
+      const cpId = document.getElementById('modal-cp-select').value;
+      const cp = cps.find(c => c.id === cpId);
+      if (!cp) return;
+      cp.sepWalkins = parseInt(document.getElementById('modal-sep-w').value) || 0;
+      cp.octWalkins = parseInt(document.getElementById('modal-oct-w').value) || 0;
+      cp.novWalkins = parseInt(document.getElementById('modal-nov-w').value) || 0;
+      cp.totalWalkins = cp.sepWalkins + cp.octWalkins + cp.novWalkins;
+      cp.bookings2025 = parseInt(document.getElementById('modal-b25').value) || 0;
+      cp.bookings2026 = parseInt(document.getElementById('modal-b26').value) || 0;
+      cp.projects = document.getElementById('modal-projects').value.trim();
+      if (cp.bookings2026 > 0 || cp.totalWalkins >= 2) cp.persona = 'Favorite';
+      closeWeeklyLeadModal();
+      saveData();
+    }
+
+    function openAddCPModal() {
+      document.getElementById('modal-add-cp').classList.remove('hidden');
+    }
+
+    function closeAddCPModal() {
+      document.getElementById('modal-add-cp').classList.add('hidden');
+    }
+
+    function saveNewCPModal() {
+      const name = document.getElementById('add-cp-name').value.trim();
+      const mob = document.getElementById('add-cp-mob').value.trim();
+      const addr = document.getElementById('add-cp-addr').value.trim() || '-';
+      if (!name) return alert('Enter CP Name');
+      const [z, cl, d] = addr === '-' ? ['Zone 0: Missing Address (Tele-Queue)', 'Unmapped - Needs Address Collection', 0] : mapAreaToZone(addr);
+      cps.unshift({
+        id: 'CP-' + Date.now(),
+        cpId: 'NEW-' + (cps.length + 1),
+        name, mobile: mob, rera: 'Pending', address: addr,
+        missingAddress: addr === '-', createdBy: 'Nitesh Kumar J',
+        zone: z, cluster: cl, distKm: d, inActiveSheet: true,
+        bookings2025: 0, bookings2026: 0, revSepCr: 0,
+        sepWalkins: 0, octWalkins: 0, novWalkins: 0, totalWalkins: 0,
+        projects: '', persona: 'OK-OK', lastVisited: '', scheduledToday: true,
+        meetingDone: false, notes: 'Newly added CP'
+      });
+      document.getElementById('add-cp-name').value = '';
+      document.getElementById('add-cp-mob').value = '';
+      document.getElementById('add-cp-addr').value = '';
+      closeAddCPModal();
+      initCallerFilters();
+      saveData();
+    }
+
+    function exportFullCSV() {
+      const headers = ['Sys_ID','CP_ID','CP_Name','Mobile','Persona','Priority_Score','Zone','Cluster','Dist_Km','Walkins_2026','Bookings_2025','Bookings_2026','Projects','Missing_Address','Address','Last_Visited','Notes'];
+      const rows = cps.map(c => [
+        c.id, c.cpId, `"${(c.name || '').replace(/"/g, '""')}"`, c.mobile, c.persona, computePriority(c),
+        `"${(c.zone || '').replace(/"/g, '""')}"`, `"${(c.cluster || '').replace(/"/g, '""')}"`, c.distKm,
+        c.totalWalkins, c.bookings2025, c.bookings2026, `"${(c.projects || '').replace(/"/g, '""')}"`,
+        c.missingAddress ? 'Yes' : 'No', `"${(c.address || '').replace(/"/g, '""')}"`,
+        `"${(c.lastVisited || '').replace(/"/g, '""')}"`, `"${(c.notes || '').replace(/"/g, '""')}"`
+      ].join(','));
+      downloadFile([headers.join(','), ...rows].join('\n'), 'Nitesh_CP_Master_164_CPs.csv', 'text/csv;charset=utf-8;');
+    }
+
+    function exportConveyanceCSV() {
+      const headers = ['Date','From','To_Circuit','Purpose','Kms','Claim_2W_Rs_5_50','Claim_4W_Rs_9_00'];
+      const rows = conveyance.map(r => {
+        const km = Number(r.kms) || 0;
+        return [r.date, `"${r.from}"`, `"${(r.to || '').replace(/"/g, '""')}"`, `"${(r.purpose || '').replace(/"/g, '""')}"`, km.toFixed(1), (km * 5.5).toFixed(2), (km * 9.0).toFixed(2)].join(',');
+      });
+      downloadFile([headers.join(','), ...rows].join('\n'), 'Nitesh_Conveyance_Claim.csv', 'text/csv;charset=utf-8;');
+    }
+
+    function downloadUpdatedHTMLFile() {
+      let src = document.documentElement.outerHTML;
+      src = src.replace(/const DEFAULT_CPS = \[.*?\];/s, 'const DEFAULT_CPS = ' + JSON.stringify(cps) + ';');
+      src = src.replace(/const DEFAULT_CONVEYANCE = \[.*?\];/s, 'const DEFAULT_CONVEYANCE = ' + JSON.stringify(conveyance) + ';');
+      downloadFile('<!DOCTYPE html>\n' + src, 'niteshcp.html', 'text/html;charset=utf-8;');
+    }
+
+    function downloadFile(content, filename, mime) {
+      const blob = new Blob([content], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function renderAll() {
+      renderTab1();
+      renderCallerCards();
+      renderTab3();
+      renderTab4();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      initCallerFilters();
+      renderAll();
+    });
+  </script>
+</body>
+</html>
